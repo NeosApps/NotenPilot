@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f97316">
+<title>NotenPilot Schweiz – Deine Noten-App</title>
+<meta name="description" content="NotenPilot Schweiz – lokale Notenverwaltung mit Fächerübersicht, Zielnoten, Statistiken und Tutorial.">
+<meta name="application-name" content="NotenPilot Schweiz">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NotenPilot Schweiz">
+<meta property="og:description" content="Noten, Ziele und Statistiken übersichtlich verwalten.">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+
+<style>
+:root{
+  --brand:#f97316;--brand2:#ea580c;--brandSoft:#fff1e8;--bg:#f7f8fb;--card:#fff;
+  --text:#182033;--muted:#687386;--line:#e3e7ee;--good:#15803d;--bad:#b91c1c;
+  --warn:#b45309;--shadow:0 12px 32px rgba(24,32,51,.08);--radius:20px;--side:280px
+}
+[data-theme="dark"]{
+  --bg:#0f131b;--card:#181e28;--text:#f4f6fa;--muted:#a7b0bf;--line:#303846;
+  --brandSoft:#3a2115;--shadow:0 16px 38px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);
+font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 35%,transparent);outline-offset:2px}
+.auth{min-height:100vh;display:grid;grid-template-columns:1.15fr .85fr}
+.auth-hero{position:relative;overflow:hidden;padding:56px;color:#fff;background:
+radial-gradient(circle at 80% 15%,rgba(249,115,22,.35),transparent 30%),
+linear-gradient(145deg,#111827,#252b39 70%,#7c2d12 150%);display:flex;flex-direction:column;justify-content:space-between}
+.auth-hero h1{font-size:clamp(44px,7vw,78px);line-height:.97;letter-spacing:-.055em;margin:30px 0 20px;max-width:760px}
+.auth-hero p{color:#d9dee7;font-size:20px;max-width:650px}.auth-points{display:grid;gap:11px;margin-top:30px}
+.auth-point{display:flex;gap:10px;align-items:center}.check{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:rgba(249,115,22,.25);color:#fdba74;font-weight:900}
+.auth-panel{display:grid;place-items:center;padding:28px;background:var(--card)}.auth-card{width:min(100%,470px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:950;font-size:22px;letter-spacing:-.03em}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;box-shadow:0 10px 25px rgba(249,115,22,.35)}
+.tabs{display:flex;background:color-mix(in srgb,var(--bg) 82%,var(--card));padding:5px;border-radius:14px;margin:22px 0}
+.tab{flex:1;border:0;background:transparent;padding:11px;border-radius:10px;font-weight:850;color:var(--muted)}
+.tab.active{background:var(--card);color:var(--text);box-shadow:0 3px 12px rgba(0,0,0,.08)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}
+label{font-size:13px;color:var(--muted);font-weight:800}.input,.select,.textarea{width:100%;min-height:48px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);padding:10px 12px}
+.textarea{min-height:105px;resize:vertical}.input:focus,.select:focus,.textarea:focus{border-color:var(--brand);outline:none}
+.btn{border:0;border-radius:13px;min-height:46px;padding:10px 16px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translateY(-1px)}.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.btn-secondary{background:color-mix(in srgb,var(--bg) 78%,var(--card));color:var(--text);border:1px solid var(--line)}
+.btn-danger{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}.btn-block{width:100%}.btn-sm{min-height:36px;padding:7px 11px;font-size:13px}
+.message{padding:11px 13px;border-radius:12px;margin:10px 0;font-size:14px}.message.bad{background:#fef2f2;color:#b91c1c}.message.good{background:#ecfdf3;color:#15803d}
+.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--card);border-right:1px solid var(--line);padding:18px 13px;display:flex;flex-direction:column;z-index:30}
+.sidebar .brand{padding:5px 9px 20px}.nav{display:grid;gap:5px;overflow:auto;padding:3px}.nav-btn{border:0;background:transparent;color:var(--muted);border-radius:14px;min-height:48px;padding:10px 12px;text-align:left;display:flex;gap:12px;align-items:center;font-weight:800}
+.nav-btn:hover{background:var(--bg);color:var(--text)}.nav-btn.active{background:var(--brandSoft);color:var(--brand2)}
+.nav-icon{width:27px;text-align:center;font-size:19px}.side-profile{margin-top:auto;border-top:1px solid var(--line);padding:14px 8px 0;display:flex;gap:10px;align-items:center}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:950;flex:0 0 auto;object-fit:cover}.side-profile div{min-width:0}.side-profile strong,.side-profile span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side-profile span{font-size:12px;color:var(--muted)}
+.main{margin-left:var(--side)}.topbar{height:72px;position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px}
+.topbar strong{font-size:19px}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{width:43px;height:43px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);display:grid;place-items:center;font-size:20px}
+.content{padding:28px;max-width:1450px;margin:auto}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:900;color:var(--brand2)}
+.page-head h1{margin:5px 0 5px;font-size:34px;line-height:1.06;letter-spacing:-.04em}.page-head p{margin:0;color:var(--muted);max-width:720px}.actions{display:flex;gap:9px;flex-wrap:wrap}
+.grid{display:grid;gap:17px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}.flat{box-shadow:none}.card h2,.card h3{margin-top:0}
+.hero-card{background:linear-gradient(145deg,#1f2937,#4a2413);color:#fff;border:0;position:relative;overflow:hidden}.hero-card:after{content:"✓";position:absolute;right:-20px;top:-70px;font-size:230px;color:rgba(255,255,255,.05);font-weight:900}
+.hero-card p{color:#e5e7eb}.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.quick{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);color:#fff;border-radius:16px;padding:15px;text-align:left;font-weight:900}
+.quick span{display:block;font-size:25px;margin-bottom:5px}.stat{min-height:145px}.stat-label{color:var(--muted);font-size:13px;font-weight:800}.stat-value{font-size:38px;font-weight:950;letter-spacing:-.05em;margin:15px 0 5px}.stat-note{color:var(--muted);font-size:13px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:13px;margin:26px 0 12px}.section-head h2{margin:0;font-size:21px}.section-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.subject-card{position:relative;overflow:hidden}.subject-strip{height:8px;margin:-20px -20px 18px;border-radius:8px}.subject-top{display:flex;justify-content:space-between;gap:14px}.subject-name{font-size:18px;font-weight:950}.muted{color:var(--muted)}.grade-large{font-size:36px;font-weight:950;letter-spacing:-.05em}
+.mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}.mini{background:var(--bg);border-radius:12px;padding:10px}.mini span{display:block;font-size:12px;color:var(--muted)}.mini strong{font-size:15px}
+.list{display:grid;gap:10px}.list-item{display:flex;align-items:center;justify-content:space-between;gap:13px;padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--card)}.list-main{min-width:0}.list-main strong{display:block}.list-main span{display:block;color:var(--muted);font-size:13px}.list-actions{display:flex;gap:7px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;background:var(--bg);color:var(--muted);font-size:12px;font-weight:850}.badge.good{background:#ecfdf3;color:#15803d}.badge.warn{background:#fff7ed;color:#b45309}.badge.brand{background:var(--brandSoft);color:var(--brand2)}
+.empty{min-height:310px;display:grid;place-items:center;text-align:center}.empty-inner{max-width:520px}.empty-icon{width:76px;height:76px;border-radius:24px;background:var(--brandSoft);color:var(--brand2);display:grid;place-items:center;font-size:35px;margin:0 auto 16px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:17px;background:var(--card)}table{width:100%;border-collapse:collapse;min-width:690px}th,td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line)}th{background:var(--bg);color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}tr:last-child td{border-bottom:0}
+.grade-pill{display:inline-grid;place-items:center;min-width:46px;height:35px;border-radius:10px;background:var(--bg);font-weight:950}.grade-pill.good{background:#ecfdf3;color:#15803d}.grade-pill.bad{background:#fef2f2;color:#b91c1c}
+.progress{height:10px;border-radius:999px;background:var(--bg);overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:inherit}
+.goal-card .target{font-size:43px;font-weight:950;color:var(--brand2)}.report-sheet{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px}.report-title{text-align:center;border-bottom:2px solid var(--text);padding-bottom:18px;margin-bottom:20px}.report-title h2{font-size:30px;margin:0}
+.settings-group{margin-bottom:18px}.settings-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:15px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border:0}.settings-row h3{margin:0;font-size:15px}.settings-row p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.notice{border-left:5px solid var(--brand);border-radius:14px;background:var(--card);border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 16px}.notice h3{margin:0 0 4px}.notice p{margin:0;color:var(--muted)}
+.premium{background:linear-gradient(145deg,#1f2937,#5c2a12);color:#fff;border:0}.premium p{color:#e5e7eb}.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}.feature{background:rgba(255,255,255,.08);border-radius:13px;padding:11px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(6,10,17,.6);backdrop-filter:blur(6px);z-index:100;display:grid;place-items:center;padding:18px}.modal{width:min(720px,100%);max-height:92vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px 21px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:2}.modal-head h2{margin:0;font-size:23px}.modal-body{padding:21px}.modal-foot{padding:17px 21px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px}
+.toast-wrap{position:fixed;right:18px;bottom:18px;display:grid;gap:9px;z-index:200}.toast{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);min-width:260px}.toast.bad{border-left-color:var(--bad)}
+.bottom-nav{display:none}.more-panel{display:none}
+body.primary-mode .content{max-width:1180px}body.primary-mode .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.primary-mode .btn{min-height:50px}body.primary-mode .nav-btn{min-height:52px;font-size:15px}
+body.primary-mode .page-head p{font-size:16px}body.primary-mode .card{padding:22px}
+body.primary-mode .quick-grid{grid-template-columns:repeat(2,1fr)}
+@media(max-width:980px){.grid-4,.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.auth-hero{padding:38px}}
+@media(max-width:790px){
+ .auth{grid-template-columns:1fr}.auth-hero{display:none}.auth-panel{min-height:100vh;padding:20px}.sidebar{display:none}.main{margin-left:0;padding-bottom:82px}.topbar{height:64px;padding:0 14px}.content{padding:17px 13px}
+ .bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--line);padding:6px 5px max(6px,env(safe-area-inset-bottom))}
+ .bottom-nav button{border:0;background:transparent;color:var(--muted);border-radius:11px;min-height:59px;font-size:10px;font-weight:850}.bottom-nav button span{display:block;font-size:21px;line-height:1.15}.bottom-nav button.active{background:var(--brandSoft);color:var(--brand2)}
+ .page-head{flex-direction:column}.grid-2,.grid-3{grid-template-columns:1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.feature-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:1fr 1fr}
+ .list-item{align-items:flex-start}.list-actions{justify-content:flex-end}.topbar .badge{display:none}
+}
+@media(max-width:500px){.grid-4,body.primary-mode .grid-4{grid-template-columns:1fr 1fr;gap:10px}.stat{min-height:125px;padding:16px!important}.stat-value{font-size:31px}.quick-grid{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.report-sheet{padding:18px}}
+@media print{.sidebar,.topbar,.bottom-nav,.actions,.btn{display:none!important}.main{margin:0}.content{padding:0}.report-sheet{border:0;box-shadow:none}}
+
+/* Erweiterte Navigation, visuelle Übersicht, Einrichtung und Einführung */
+.nav-home{margin-bottom:5px}.nav-pack{border:1px solid transparent;border-radius:16px;overflow:hidden}
+.nav-pack.active{border-color:var(--line);background:color-mix(in srgb,var(--bg) 62%,var(--card))}
+.nav-pack-btn{width:100%;border:0;background:transparent;color:var(--muted);border-radius:14px;min-height:48px;padding:10px 12px;text-align:left;display:flex;gap:11px;align-items:center;font-weight:900}
+.nav-pack-btn:hover,.nav-pack.active>.nav-pack-btn{color:var(--text)}.nav-pack-btn .chev{margin-left:auto;transition:.2s transform}
+.nav-pack.open .nav-pack-btn .chev{transform:rotate(90deg)}.nav-pack-items{display:none;padding:0 7px 8px 40px;gap:4px}
+.nav-pack.open .nav-pack-items{display:grid}.nav-sub-btn{border:0;background:transparent;color:var(--muted);border-radius:11px;min-height:38px;padding:8px 10px;text-align:left;font-weight:780}
+.nav-sub-btn:hover{background:var(--card);color:var(--text)}.nav-sub-btn.active{background:var(--brandSoft);color:var(--brand2)}
+.dashboard-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:center;background:linear-gradient(145deg,#172033,#3d261c 76%,var(--brand2));color:#fff;border:0;overflow:hidden;min-height:330px}
+.dashboard-hero h1{font-size:clamp(34px,4vw,54px);letter-spacing:-.055em;line-height:1.02;margin:12px 0}.dashboard-hero p{font-size:17px;color:#e7eaf0;max-width:650px}
+.dashboard-hero .actions{margin-top:22px}.hero-badges{display:flex;gap:8px;flex-wrap:wrap}.hero-badges .badge{background:rgba(255,255,255,.11);color:#fff}
+.hero-illustration{min-height:270px;display:grid;place-items:center}.hero-illustration svg{width:min(100%,440px);height:auto;filter:drop-shadow(0 26px 35px rgba(0,0,0,.25))}
+.overview-pack-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.overview-pack{position:relative;overflow:hidden;min-height:220px;text-align:left;border:1px solid var(--line);border-radius:21px;background:var(--card);color:var(--text);padding:19px;box-shadow:var(--shadow);transition:.2s transform,.2s border-color}
+.overview-pack:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}.overview-pack h3{margin:7px 0 5px;font-size:19px}.overview-pack p{margin:0;color:var(--muted);font-size:13px;max-width:200px}.overview-pack .pack-icon{font-size:25px}.pack-art{position:absolute;right:-18px;bottom:-18px;width:145px;height:115px;opacity:.98}.pack-link{position:absolute;left:19px;bottom:17px;color:var(--brand2);font-weight:900;font-size:13px}
+.visual-summary{display:grid;grid-template-columns:1.2fr .8fr;gap:17px}.mini-timeline{display:grid;gap:12px}.timeline-row{display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center;padding:12px;border-radius:14px;background:var(--bg)}.timeline-icon{width:42px;height:42px;border-radius:13px;background:var(--brandSoft);color:var(--brand2);display:grid;place-items:center;font-size:20px}
+.onboarding-shell{position:fixed;inset:0;z-index:500;background:radial-gradient(circle at 12% 10%,color-mix(in srgb,var(--brand) 25%,transparent),transparent 30%),linear-gradient(145deg,#101827,#273246);padding:24px;overflow:auto;display:grid;place-items:center}
+.onboarding-card{width:min(1020px,100%);background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:0 34px 100px rgba(0,0,0,.38);overflow:hidden;display:grid;grid-template-columns:290px 1fr;min-height:650px}
+.onboarding-side{padding:30px;color:#fff;background:linear-gradient(165deg,#172033,#3f281f 72%,var(--brand2));display:flex;flex-direction:column}.onboarding-side .brand{margin-bottom:35px}.onboarding-side h2{font-size:31px;line-height:1.05;margin:0 0 12px}.onboarding-side p{color:#dce2ec}.onboarding-steps{display:grid;gap:13px;margin-top:24px}.onboarding-step{display:flex;gap:11px;align-items:center;color:#b9c2d1;font-weight:800}.onboarding-step span{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.09)}.onboarding-step.active{color:#fff}.onboarding-step.active span,.onboarding-step.done span{background:var(--brand);color:#fff}
+.onboarding-main{padding:34px;display:flex;flex-direction:column}.onboarding-main h1{font-size:36px;letter-spacing:-.045em;margin:3px 0 8px}.onboarding-content{flex:1}.onboarding-foot{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:20px;margin-top:24px}.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.setup-option{border:1px solid var(--line);border-radius:17px;padding:15px;background:var(--card)}
+.subject-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-height:350px;overflow:auto;padding:3px}.subject-choice{position:relative}.subject-choice input{position:absolute;opacity:0}.subject-choice label{display:flex;align-items:center;gap:9px;min-height:54px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;color:var(--text);background:var(--card);cursor:pointer}.subject-choice input:checked+label{border-color:var(--brand);background:var(--brandSoft);color:var(--brand2)}
+.color-grid{display:flex;flex-wrap:wrap;gap:11px;margin-top:9px}.color-choice{width:42px;height:42px;border-radius:50%;border:4px solid var(--card);box-shadow:0 0 0 1px var(--line);cursor:pointer}.color-choice.active{box-shadow:0 0 0 3px var(--text)}.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.theme-choice{border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer}.theme-choice.active{border-color:var(--brand);background:var(--brandSoft)}.setup-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.setup-summary .mini{padding:15px}
+.tour-layer{position:fixed;inset:0;z-index:450;background:rgba(7,12,21,.20);pointer-events:none}.tour-card{position:fixed;right:22px;bottom:22px;width:min(430px,calc(100vw - 30px));background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:22px;box-shadow:0 28px 80px rgba(0,0,0,.32);padding:20px;pointer-events:auto}.tour-card h2{margin:5px 0 7px}.tour-card p{color:var(--muted);margin:0 0 17px}.tour-progress{height:7px;border-radius:99px;background:var(--bg);overflow:hidden;margin-bottom:15px}.tour-progress span{display:block;height:100%;background:var(--brand)}.tour-actions{display:flex;justify-content:space-between;gap:8px}.tour-count{font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.switch{display:inline-flex;align-items:center;gap:9px;font-weight:850;color:var(--text)}.switch input{width:20px;height:20px;accent-color:var(--brand)}
+@media(max-width:1150px){.overview-pack-grid{grid-template-columns:repeat(2,1fr)}.dashboard-hero{grid-template-columns:1fr .75fr}}
+@media(max-width:790px){.dashboard-hero{grid-template-columns:1fr;padding:22px}.hero-illustration{min-height:190px}.overview-pack-grid{grid-template-columns:1fr 1fr}.onboarding-shell{padding:0}.onboarding-card{min-height:100vh;border-radius:0;grid-template-columns:1fr}.onboarding-side{padding:19px;min-height:auto}.onboarding-side h2,.onboarding-side p{display:none}.onboarding-steps{display:flex;overflow:auto;margin-top:16px}.onboarding-step{min-width:max-content}.onboarding-main{padding:23px 18px}.subject-choice-grid{grid-template-columns:repeat(2,1fr)}.visual-summary{grid-template-columns:1fr}}
+@media(max-width:520px){.overview-pack-grid,.setup-grid,.setup-summary{grid-template-columns:1fr}.overview-pack{min-height:190px}.subject-choice-grid{grid-template-columns:1fr}.theme-grid{grid-template-columns:1fr}.onboarding-main h1{font-size:30px}.tour-card{right:15px;bottom:90px}}
+
+
+/* Bereichsfarben und verbesserte Navigation */
+body{--section-accent:var(--brand);--section-soft:var(--brandSoft);--section-strong:var(--brand2)}
+body[data-section="school"]{--section-accent:#2563eb;--section-soft:#eff6ff;--section-strong:#1d4ed8}
+body[data-section="planning"]{--section-accent:#059669;--section-soft:#ecfdf5;--section-strong:#047857}
+body[data-section="insights"]{--section-accent:#7c3aed;--section-soft:#f5f3ff;--section-strong:#6d28d9}
+body[data-section="account"]{--section-accent:#f97316;--section-soft:#fff7ed;--section-strong:#ea580c}
+[data-theme="dark"] body[data-section="school"]{--section-soft:#142544}
+[data-theme="dark"] body[data-section="planning"]{--section-soft:#0f3329}
+[data-theme="dark"] body[data-section="insights"]{--section-soft:#2a1d47}
+[data-theme="dark"] body[data-section="account"]{--section-soft:#3a2115}
+.main .page-head{position:relative;padding-bottom:16px}
+.main .page-head:after{content:"";position:absolute;left:0;bottom:0;width:74px;height:5px;border-radius:999px;background:var(--section-accent)}
+.main .page-head .eyebrow{color:var(--section-strong)}
+.nav-pack[data-group="school"]{--group-accent:#2563eb;--group-soft:#eff6ff;--group-strong:#1d4ed8}
+.nav-pack[data-group="planning"]{--group-accent:#059669;--group-soft:#ecfdf5;--group-strong:#047857}
+.nav-pack[data-group="insights"]{--group-accent:#7c3aed;--group-soft:#f5f3ff;--group-strong:#6d28d9}
+.nav-pack[data-group="account"]{--group-accent:#f97316;--group-soft:#fff7ed;--group-strong:#ea580c}
+[data-theme="dark"] .nav-pack[data-group="school"]{--group-soft:#142544}
+[data-theme="dark"] .nav-pack[data-group="planning"]{--group-soft:#0f3329}
+[data-theme="dark"] .nav-pack[data-group="insights"]{--group-soft:#2a1d47}
+[data-theme="dark"] .nav-pack[data-group="account"]{--group-soft:#3a2115}
+.nav-pack{transition:border-color .2s,background .2s}
+.nav-pack.open,.nav-pack.active{border-color:color-mix(in srgb,var(--group-accent) 35%,var(--line));background:color-mix(in srgb,var(--group-soft) 72%,var(--card))}
+.nav-pack-btn{position:relative}
+.nav-pack-btn:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--group-accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--group-accent) 14%,transparent);flex:0 0 auto}
+.nav-pack.open>.nav-pack-btn,.nav-pack.active>.nav-pack-btn{color:var(--group-strong)}
+.nav-pack-btn .chev{font-size:22px;font-weight:900;line-height:1}
+.nav-pack-items{display:grid!important;max-height:0;opacity:0;overflow:hidden;padding:0 7px 0 40px!important;gap:4px;transition:max-height .24s ease,opacity .18s ease,padding .24s ease}
+.nav-pack.open .nav-pack-items{max-height:320px;opacity:1;padding:0 7px 9px 40px!important}
+.nav-sub-btn{border-left:3px solid transparent}
+.nav-sub-btn.active{background:var(--group-soft);color:var(--group-strong);border-left-color:var(--group-accent)}
+.nav-sub-btn:hover{background:color-mix(in srgb,var(--group-soft) 70%,var(--card));color:var(--group-strong)}
+
+/* Farblich klar getrennte Bereichskarten */
+.overview-pack{--pack-accent:var(--brand);--pack-soft:var(--brandSoft);min-height:270px;padding:20px 19px 18px;display:flex;flex-direction:column;align-items:flex-start}
+.overview-pack:before{content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--pack-accent)}
+.overview-pack[data-pack-menu="school"]{--pack-accent:#2563eb;--pack-soft:#eff6ff}
+.overview-pack[data-pack-menu="planning"]{--pack-accent:#059669;--pack-soft:#ecfdf5}
+.overview-pack[data-pack-menu="insights"]{--pack-accent:#7c3aed;--pack-soft:#f5f3ff}
+.overview-pack[data-pack-menu="account"]{--pack-accent:#f97316;--pack-soft:#fff7ed}
+[data-theme="dark"] .overview-pack[data-pack-menu="school"]{--pack-soft:#142544}
+[data-theme="dark"] .overview-pack[data-pack-menu="planning"]{--pack-soft:#0f3329}
+[data-theme="dark"] .overview-pack[data-pack-menu="insights"]{--pack-soft:#2a1d47}
+[data-theme="dark"] .overview-pack[data-pack-menu="account"]{--pack-soft:#3a2115}
+.overview-pack:hover{border-color:var(--pack-accent);box-shadow:0 18px 42px color-mix(in srgb,var(--pack-accent) 16%,transparent)}
+.overview-pack .pack-icon{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:var(--pack-soft);color:var(--pack-accent);font-size:23px;margin-top:3px}
+.overview-pack h3{color:var(--pack-accent);max-width:64%}
+.overview-pack p{max-width:64%;font-size:13px;line-height:1.48}
+.pack-features{display:flex;flex-wrap:wrap;gap:6px;max-width:66%;margin:12px 0 42px}
+.pack-feature{padding:5px 8px;border-radius:999px;background:var(--pack-soft);color:var(--pack-accent);font-size:11px;font-weight:900}
+.overview-pack .pack-link{color:var(--pack-accent)}
+.overview-pack .pack-art{right:-4px;bottom:6px;width:43%;height:142px;display:grid;place-items:end}.overview-pack .pack-art svg{width:100%;height:100%}
+
+/* Detailliertere Ziele- und Planungsansichten */
+.planning-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.48fr);gap:18px;align-items:center;padding:23px;background:linear-gradient(135deg,color-mix(in srgb,var(--section-accent) 12%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--section-accent) 25%,var(--line));border-radius:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.planning-intro .eyebrow{color:var(--section-strong)}.planning-intro h2{margin:4px 0 7px;font-size:25px}.planning-intro p{margin:0;color:var(--muted)}
+.planning-visual{min-height:150px;display:grid;place-items:center}.planning-visual svg{width:min(100%,250px);height:auto}
+.planning-nav-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:22px}
+.planning-nav-card{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:16px;padding:13px;text-align:left;display:flex;gap:10px;align-items:center;font-weight:900;min-height:68px}
+.planning-nav-card span{width:38px;height:38px;border-radius:12px;background:var(--section-soft);color:var(--section-strong);display:grid;place-items:center;font-size:19px;flex:0 0 auto}
+.planning-nav-card.active,.planning-nav-card:hover{border-color:var(--section-accent);background:var(--section-soft);color:var(--section-strong)}
+.goal-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:18px 0 22px}
+.goal-summary{padding:17px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.goal-summary strong{display:block;font-size:30px;letter-spacing:-.04em;color:var(--section-strong);margin-top:8px}.goal-summary span{color:var(--muted);font-size:13px;font-weight:800}
+.goal-card{position:relative;overflow:hidden;border-top:6px solid var(--section-accent)}
+.goal-card .target{color:var(--section-strong)}
+.goal-progress{height:12px;border-radius:999px;background:var(--bg);overflow:hidden;margin:14px 0 7px}.goal-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--section-accent) 55%,white),var(--section-accent))}
+.goal-detail-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:13px}.goal-detail{padding:10px;border-radius:13px;background:var(--bg)}.goal-detail span{display:block;font-size:11px;color:var(--muted);font-weight:800}.goal-detail strong{font-size:14px}
+.status-chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;background:var(--section-soft);color:var(--section-strong)}
+.exam-card{border-left:6px solid var(--section-accent)}
+.exam-date{width:58px;height:58px;border-radius:16px;background:var(--section-soft);color:var(--section-strong);display:grid;place-items:center;text-align:center;font-weight:950;line-height:1.05;flex:0 0 auto}.exam-date small{font-size:10px;text-transform:uppercase}
+.planner-result{margin-top:18px;padding:18px;border-radius:18px;border:1px solid color-mix(in srgb,var(--section-accent) 32%,var(--line));background:var(--section-soft)}
+.planner-result strong{font-size:34px;color:var(--section-strong)}
+@media(max-width:980px){.planning-nav-grid,.goal-summary-grid{grid-template-columns:repeat(2,1fr)}.planning-intro{grid-template-columns:1fr}}
+@media(max-width:620px){.planning-nav-grid,.goal-summary-grid,.goal-detail-row{grid-template-columns:1fr}.overview-pack h3,.overview-pack p,.pack-features{max-width:78%}.overview-pack .pack-art{opacity:.55;width:48%}}
+
+
+/* Neues NotenPilot-Logo */
+.logo{position:relative;isolation:isolate;width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#ff7a18 0%,#f43f5e 58%,#7c3aed 115%);color:#fff;display:grid;place-items:center;box-shadow:0 12px 28px rgba(244,63,94,.24);flex:0 0 auto;overflow:hidden}
+.logo:after{content:"";position:absolute;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);right:-10px;top:-11px;z-index:-1}
+.logo svg{width:31px;height:31px;display:block}.logo-plane{fill:rgba(255,255,255,.19);stroke:#fff;stroke-width:2.7;stroke-linejoin:round}.logo-fold{fill:none;stroke:#fff;stroke-width:2.7;stroke-linecap:round}.logo-route{fill:none;stroke:#fff;stroke-width:2.7;stroke-linecap:round;stroke-dasharray:3.2 3.5}.logo-dot{fill:#fff}
+.brand-word{display:flex;align-items:baseline;gap:5px;white-space:nowrap;overflow:hidden}.brand-word small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:900}
+.auth-hero .brand-word small,.onboarding-side .brand-word small{color:rgba(255,255,255,.72)}
+
+/* Verstellbare und einklappbare Seitenleiste */
+.sidebar{min-width:88px;max-width:390px;transition:width .22s ease;padding-right:14px;overflow:visible}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px}.sidebar-head .brand{padding:4px 5px 15px;min-width:0}
+.sidebar-toggle{width:34px;height:34px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--muted);font-size:25px;line-height:1;display:grid;place-items:center;flex:0 0 auto;transition:.2s}
+.sidebar-toggle:hover{color:var(--text);border-color:var(--section-accent);background:var(--section-soft)}
+.sidebar-resizer{position:absolute;top:0;right:-6px;width:12px;height:100%;border:0;background:transparent;cursor:ew-resize;z-index:5;padding:0}
+.sidebar-resizer:after{content:"";position:absolute;top:42%;bottom:42%;left:4px;width:3px;border-radius:99px;background:var(--line);transition:.2s}
+.sidebar-resizer:hover:after,body.sidebar-resizing .sidebar-resizer:after{top:34%;bottom:34%;background:var(--section-accent)}
+body.sidebar-resizing{cursor:ew-resize;user-select:none}
+.nav-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:normal}.nav-sub-btn{display:flex;align-items:center;gap:8px}.nav-sub-icon{width:22px;text-align:center;flex:0 0 auto}
+body.sidebar-collapsed .sidebar-head{justify-content:center;flex-direction:column;gap:3px}body.sidebar-collapsed .sidebar-head .brand{padding-bottom:4px}
+body.sidebar-collapsed .brand-word,body.sidebar-collapsed .nav-label,body.sidebar-collapsed .nav-pack-btn .chev,body.sidebar-collapsed .side-profile>div{display:none}
+body.sidebar-collapsed .sidebar{padding:13px 9px}body.sidebar-collapsed .sidebar-toggle{transform:rotate(180deg);width:30px;height:30px;font-size:22px;background:transparent;border-color:transparent}
+body.sidebar-collapsed .nav{padding:4px 0;gap:7px}body.sidebar-collapsed .nav-btn,body.sidebar-collapsed .nav-pack-btn{justify-content:center;padding:9px;min-height:50px}
+body.sidebar-collapsed .nav-icon{width:30px;font-size:21px}body.sidebar-collapsed .nav-pack{overflow:visible}body.sidebar-collapsed .nav-pack-items{display:none!important}
+body.sidebar-collapsed .side-profile{justify-content:center;padding:13px 0 0}body.sidebar-collapsed .avatar{width:40px;height:40px}
+.nav-pack-btn:before{display:none!important}
+
+/* Farbiger Bereich „Aktueller Stand“ */
+.status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.status-card{--metric:#2563eb;--metric-soft:#eff6ff;position:relative;overflow:hidden;min-height:178px;padding:18px;border:1px solid color-mix(in srgb,var(--metric) 19%,var(--line));border-radius:21px;background:linear-gradient(145deg,var(--card) 42%,color-mix(in srgb,var(--metric-soft) 78%,var(--card)));box-shadow:var(--shadow)}
+.status-card:after{content:"";position:absolute;width:112px;height:112px;border-radius:50%;right:-48px;top:-48px;background:var(--metric);opacity:.08}.status-blue{--metric:#2563eb;--metric-soft:#eff6ff}.status-teal{--metric:#0891b2;--metric-soft:#ecfeff}.status-violet{--metric:#7c3aed;--metric-soft:#f5f3ff}.status-orange{--metric:#f97316;--metric-soft:#fff7ed}
+[data-theme="dark"] .status-blue{--metric-soft:#142544}[data-theme="dark"] .status-teal{--metric-soft:#10323a}[data-theme="dark"] .status-violet{--metric-soft:#2a1d47}[data-theme="dark"] .status-orange{--metric-soft:#3a2115}
+.status-card-head{display:flex;align-items:center;gap:10px}.status-symbol{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:var(--metric-soft);color:var(--metric);font-size:21px;font-weight:950}.status-label{font-size:13px;font-weight:900;color:var(--muted)}
+.status-number{font-size:39px;font-weight:950;letter-spacing:-.05em;margin:15px 0 0;color:var(--metric)}.status-copy{font-size:12px;color:var(--muted);min-height:20px}.status-meter{height:8px;border-radius:99px;background:color-mix(in srgb,var(--metric) 10%,var(--bg));overflow:hidden;margin-top:15px}.status-meter span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--metric) 55%,white),var(--metric))}.status-scale{display:flex;justify-content:space-between;margin-top:5px;color:var(--muted);font-size:10px;font-weight:800}
+
+/* Neu geordneter Bereich Ziele & Planung */
+.planning-hub{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:20px;align-items:center;padding:22px 24px;border:1px solid color-mix(in srgb,var(--section-accent) 24%,var(--line));border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--section-soft) 82%,var(--card)),var(--card));box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+.planning-hub h2{margin:4px 0 6px;font-size:25px;letter-spacing:-.025em}.planning-hub p{margin:0;color:var(--muted);max-width:760px}.planning-kpis{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.planning-kpi{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:var(--card);border:1px solid color-mix(in srgb,var(--section-accent) 20%,var(--line));font-size:12px;font-weight:850;color:var(--section-strong)}.planning-kpi b{font-size:14px}.planning-hub-art{height:130px;display:grid;place-items:center}.planning-hub-art svg{width:210px;max-width:100%;height:auto}
+.planning-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 0 22px}.planning-tab{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:17px;padding:12px;display:grid;grid-template-columns:42px minmax(0,1fr) 18px;gap:10px;align-items:center;text-align:left;min-height:78px;box-shadow:0 7px 20px rgba(24,32,51,.04);transition:.18s}
+.planning-tab:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--section-accent) 50%,var(--line));box-shadow:0 12px 28px color-mix(in srgb,var(--section-accent) 12%,transparent)}.planning-tab.active{background:var(--section-soft);border-color:var(--section-accent);color:var(--section-strong)}
+.planning-tab-icon{width:42px;height:42px;border-radius:13px;background:var(--section-soft);color:var(--section-strong);display:grid;place-items:center;font-size:20px;font-weight:950}.planning-tab.active .planning-tab-icon{background:var(--section-accent);color:#fff}.planning-tab-copy{min-width:0}.planning-tab-copy strong,.planning-tab-copy small{display:block}.planning-tab-copy strong{font-size:14px}.planning-tab-copy small{font-size:11px;color:var(--muted);line-height:1.3;margin-top:2px}.planning-tab-arrow{font-size:20px;color:var(--muted)}
+.goal-overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:18px 0 22px}.goal-overview-card{--goal-color:#059669;--goal-soft:#ecfdf5;padding:16px;border-radius:18px;background:linear-gradient(145deg,var(--card),var(--goal-soft));border:1px solid color-mix(in srgb,var(--goal-color) 20%,var(--line));box-shadow:var(--shadow)}.goal-overview-card:nth-child(2){--goal-color:#2563eb;--goal-soft:#eff6ff}.goal-overview-card:nth-child(3){--goal-color:#7c3aed;--goal-soft:#f5f3ff}.goal-overview-card:nth-child(4){--goal-color:#f97316;--goal-soft:#fff7ed}[data-theme="dark"] .goal-overview-card{--goal-soft:#0f3329}[data-theme="dark"] .goal-overview-card:nth-child(2){--goal-soft:#142544}[data-theme="dark"] .goal-overview-card:nth-child(3){--goal-soft:#2a1d47}[data-theme="dark"] .goal-overview-card:nth-child(4){--goal-soft:#3a2115}
+.goal-overview-top{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;font-weight:900}.goal-overview-icon{width:34px;height:34px;border-radius:11px;background:var(--goal-soft);color:var(--goal-color);display:grid;place-items:center;font-size:17px}.goal-overview-card strong{display:block;font-size:29px;color:var(--goal-color);margin-top:9px;letter-spacing:-.04em}
+.goal-card-new{--subject-color:var(--section-accent);border:1px solid color-mix(in srgb,var(--subject-color) 22%,var(--line));border-top:6px solid var(--subject-color);padding:20px}.goal-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.goal-subject-line{display:flex;align-items:center;gap:10px}.goal-subject-dot{width:12px;height:12px;border-radius:50%;background:var(--subject-color);box-shadow:0 0 0 6px color-mix(in srgb,var(--subject-color) 13%,transparent)}.goal-card-head h3{margin:0;font-size:20px}.goal-status{padding:6px 10px;border-radius:999px;background:var(--section-soft);color:var(--section-strong);font-size:11px;font-weight:900;white-space:nowrap}.goal-status.reached{background:#ecfdf3;color:#15803d}.goal-status.open{background:#f1f5f9;color:#64748b}.goal-status.warning{background:#fff7ed;color:#b45309}
+.goal-score-row{display:grid;grid-template-columns:1fr 36px 1fr;gap:9px;align-items:center;margin:18px 0 14px}.goal-score-box{padding:13px;border-radius:15px;background:var(--bg);border:1px solid var(--line)}.goal-score-box span{display:block;font-size:11px;color:var(--muted);font-weight:850}.goal-score-box strong{display:block;font-size:27px;line-height:1.1;margin-top:4px}.goal-score-box.target{background:var(--section-soft);border-color:color-mix(in srgb,var(--section-accent) 28%,var(--line));color:var(--section-strong)}.goal-score-arrow{text-align:center;color:var(--section-strong);font-size:25px;font-weight:900}
+.grade-scale{height:13px;border-radius:99px;background:var(--bg);position:relative;overflow:visible;margin-top:6px}.grade-scale-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--subject-color) 45%,white),var(--subject-color));max-width:100%}.grade-target-marker{position:absolute;top:-5px;width:4px;height:23px;border-radius:4px;background:#172033;transform:translateX(-50%);box-shadow:0 0 0 3px var(--card)}[data-theme="dark"] .grade-target-marker{background:#fff}.grade-scale-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-weight:800;margin-top:6px}
+.goal-advice{display:grid;grid-template-columns:38px 1fr;gap:11px;align-items:start;margin-top:15px;padding:13px;border-radius:15px;background:color-mix(in srgb,var(--section-soft) 72%,var(--card));border:1px solid color-mix(in srgb,var(--section-accent) 17%,var(--line))}.goal-advice-icon{width:38px;height:38px;border-radius:12px;background:var(--card);display:grid;place-items:center;font-size:18px}.goal-advice strong{display:block;font-size:13px}.goal-advice p{margin:2px 0 0;color:var(--muted);font-size:12px;line-height:1.42}.goal-meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.goal-meta{padding:6px 9px;border-radius:999px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:850}.goal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
+
+@media(max-width:1120px){.status-grid,.goal-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planning-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:790px){.sidebar-resizer,.sidebar-toggle{display:none}.status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planning-hub{grid-template-columns:1fr}.planning-hub-art{display:none}}
+@media(max-width:560px){.status-grid,.goal-overview-grid,.planning-tabs{grid-template-columns:1fr}.goal-score-row{grid-template-columns:1fr}.goal-score-arrow{transform:rotate(90deg)}.status-card{min-height:160px}}
+
+
+/* Fachfarben, Zielstatus und Trendanzeigen */
+.subject-color-palette{display:grid;grid-template-columns:repeat(9,38px);gap:10px;align-items:center;margin-top:4px}
+.subject-color-swatch{width:38px;height:38px;border:3px solid var(--card);border-radius:12px;box-shadow:0 0 0 1px var(--line);padding:0;transition:.16s}
+.subject-color-swatch:hover{transform:translateY(-2px) scale(1.04)}
+.subject-color-swatch.active{box-shadow:0 0 0 3px var(--text),0 8px 18px rgba(24,32,51,.18)}
+.subject-color-custom{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.subject-color-custom input{width:54px;height:42px;border:0;padding:0;background:transparent}
+.subject-color-preview{--preview-color:var(--brand);display:flex;align-items:center;gap:11px;margin-top:14px;padding:13px 14px;border-radius:15px;border:1px solid color-mix(in srgb,var(--preview-color) 34%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--preview-color) 13%,var(--card)),var(--card))}
+.subject-color-preview-dot,.subject-dot{display:inline-block;width:13px;height:13px;border-radius:50%;background:var(--subject-color,var(--preview-color));box-shadow:0 0 0 5px color-mix(in srgb,var(--subject-color,var(--preview-color)) 15%,transparent);flex:0 0 auto}
+.subject-color-preview strong{display:block}.subject-color-preview small{display:block;color:var(--muted)}
+
+.subject-card-color{--subject-color:var(--brand);position:relative;border:2px solid color-mix(in srgb,var(--subject-color) 32%,var(--line));background:linear-gradient(145deg,var(--card) 58%,color-mix(in srgb,var(--subject-color) 8%,var(--card)))}
+.subject-card-color.goal-good{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.10),var(--shadow)}
+.subject-card-color.goal-bad{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.09),var(--shadow)}
+.subject-grade-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.subject-name-row{display:flex;align-items:center;gap:10px}
+.subject-color-caption{display:inline-flex;align-items:center;gap:7px;padding:5px 8px;border-radius:999px;background:color-mix(in srgb,var(--subject-color) 11%,var(--card));color:var(--muted);font-size:11px;font-weight:850}
+
+.trend-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:950;white-space:nowrap}
+.trend-badge .trend-arrow{font-size:15px;line-height:1}
+.trend-up{background:#ecfdf3;color:#15803d;border:1px solid #bbf7d0}
+.trend-down{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.trend-flat{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.status-trend{margin-top:10px;min-height:29px;display:flex;align-items:center}
+.status-card.status-goal-good{--metric:#16a34a;--metric-soft:#ecfdf3;border:2px solid #22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.09),var(--shadow)}
+.status-card.status-goal-bad{--metric:#dc2626;--metric-soft:#fef2f2;border:2px solid #ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.08),var(--shadow)}
+.status-card.status-goal-neutral{--metric:#2563eb;--metric-soft:#eff6ff}
+[data-theme="dark"] .status-card.status-goal-good{--metric-soft:#123524}[data-theme="dark"] .status-card.status-goal-bad{--metric-soft:#3d1717}
+
+.dashboard-goal-list{display:grid;gap:10px}
+.dashboard-goal-row{--subject-color:var(--brand);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border:2px solid var(--line);border-radius:15px;background:linear-gradient(135deg,color-mix(in srgb,var(--subject-color) 7%,var(--card)),var(--card))}
+.dashboard-goal-row.goal-good{border-color:#22c55e;background:linear-gradient(135deg,#ecfdf3,var(--card))}
+.dashboard-goal-row.goal-bad{border-color:#ef4444;background:linear-gradient(135deg,#fef2f2,var(--card))}
+.dashboard-goal-main{display:flex;align-items:center;gap:11px;min-width:0}.dashboard-goal-main strong,.dashboard-goal-main span{display:block}.dashboard-goal-main span{font-size:12px;color:var(--muted)}
+.dashboard-goal-values{text-align:right}.dashboard-goal-values strong{display:block;font-size:17px}.dashboard-goal-values small{color:var(--muted)}
+
+.goal-card-new{position:relative;border-top-width:2px!important;overflow:hidden}
+.goal-card-new:before{content:"";position:absolute;left:18px;right:18px;top:0;height:5px;border-radius:0 0 8px 8px;background:var(--subject-color)}
+.goal-card-new.goal-state-good{border:2px solid #22c55e;background:linear-gradient(145deg,var(--card) 66%,#ecfdf3);box-shadow:0 0 0 3px rgba(34,197,94,.09),var(--shadow)}
+.goal-card-new.goal-state-bad{border:2px solid #ef4444;background:linear-gradient(145deg,var(--card) 66%,#fef2f2);box-shadow:0 0 0 3px rgba(239,68,68,.08),var(--shadow)}
+.goal-card-new.goal-state-neutral{border:2px solid color-mix(in srgb,var(--subject-color) 28%,var(--line))}
+.goal-status.reached{background:#dcfce7;color:#166534;border:1px solid #86efac}.goal-status.behind{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.goal-score-box.current-good{border:2px solid #22c55e;background:#ecfdf3}.goal-score-box.current-bad{border:2px solid #ef4444;background:#fef2f2}
+.goal-trend-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.goal-trend-label{font-size:11px;color:var(--muted);font-weight:850}
+.goal-overview-card.overall-good{--goal-color:#16a34a;--goal-soft:#ecfdf3;border:2px solid #22c55e}.goal-overview-card.overall-bad{--goal-color:#dc2626;--goal-soft:#fef2f2;border:2px solid #ef4444}
+.goal-overview-trend{margin-top:7px}
+
+.grade-subject{display:inline-flex;align-items:center;gap:9px;font-weight:850}.grade-subject .subject-dot{width:10px;height:10px;box-shadow:0 0 0 4px color-mix(in srgb,var(--subject-color) 15%,transparent)}
+.timeline-icon{background:var(--subject-color,var(--brand))!important;color:#fff!important}
+
+
+.status-symbol.trend-symbol-up,.goal-overview-icon.trend-icon-up{background:#ecfdf3!important;color:#15803d!important;border:1px solid #86efac}
+.status-symbol.trend-symbol-down,.goal-overview-icon.trend-icon-down{background:#fef2f2!important;color:#b91c1c!important;border:1px solid #fca5a5}
+.status-symbol.trend-symbol-flat,.goal-overview-icon.trend-icon-flat{background:var(--bg)!important;color:var(--muted)!important;border:1px solid var(--line)}
+[data-theme="dark"] .dashboard-goal-row.goal-good,[data-theme="dark"] .goal-card-new.goal-state-good,[data-theme="dark"] .goal-score-box.current-good{background:linear-gradient(145deg,var(--card),#123524)}
+[data-theme="dark"] .dashboard-goal-row.goal-bad,[data-theme="dark"] .goal-card-new.goal-state-bad,[data-theme="dark"] .goal-score-box.current-bad{background:linear-gradient(145deg,var(--card),#3d1717)}
+[data-theme="dark"] .trend-up,[data-theme="dark"] .status-symbol.trend-symbol-up,[data-theme="dark"] .goal-overview-icon.trend-icon-up{background:#123524!important;color:#86efac!important;border-color:#166534}
+[data-theme="dark"] .trend-down,[data-theme="dark"] .status-symbol.trend-symbol-down,[data-theme="dark"] .goal-overview-icon.trend-icon-down{background:#3d1717!important;color:#fca5a5!important;border-color:#991b1b}
+
+.subject-color-suggestion{--suggested-color:var(--brand);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;margin:4px 0 13px;border:1px solid color-mix(in srgb,var(--suggested-color) 32%,var(--line));border-radius:15px;background:linear-gradient(135deg,color-mix(in srgb,var(--suggested-color) 11%,var(--card)),var(--card))}
+.subject-color-suggestion-main{display:flex;align-items:center;gap:11px;min-width:0}.subject-color-suggestion-dot{width:34px;height:34px;border-radius:11px;background:var(--suggested-color);box-shadow:0 0 0 5px color-mix(in srgb,var(--suggested-color) 13%,transparent);flex:0 0 auto}.subject-color-suggestion strong,.subject-color-suggestion small{display:block}.subject-color-suggestion small{color:var(--muted);font-size:11px}.subject-color-suggestion .btn{border-color:color-mix(in srgb,var(--suggested-color) 38%,var(--line));white-space:nowrap}
+.subject-color-palette-note{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:8px}.subject-color-palette-note strong{font-size:13px}.subject-color-palette-note span{font-size:11px;color:var(--muted)}
+@media(max-width:560px){.subject-color-palette{grid-template-columns:repeat(5,38px)}.subject-grade-wrap{align-items:flex-start}.subject-top{flex-direction:column}.dashboard-goal-row{grid-template-columns:1fr}.dashboard-goal-values{text-align:left}}
+
+
+
+/* Kompakte Fächerübersicht auf der Titelseite */
+.dashboard-subject-section-head{align-items:flex-end}
+.dashboard-subject-panel{padding:12px;background:linear-gradient(145deg,var(--card),color-mix(in srgb,#2563eb 3%,var(--card)));border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
+.dashboard-subject-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.dashboard-subject-card{--subject-color:var(--brand);position:relative;overflow:hidden;width:100%;min-height:154px;padding:12px;border:1px solid color-mix(in srgb,var(--subject-color) 28%,var(--line));border-radius:16px;background:linear-gradient(150deg,var(--card) 58%,color-mix(in srgb,var(--subject-color) 8%,var(--card)));color:var(--text);text-align:left;box-shadow:0 5px 15px rgba(24,32,51,.045);transition:transform .16s,border-color .16s,box-shadow .16s}
+.dashboard-subject-card:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--subject-color)}
+.dashboard-subject-card:hover{transform:translateY(-2px);border-color:var(--subject-color);box-shadow:0 11px 25px color-mix(in srgb,var(--subject-color) 14%,transparent)}
+.dashboard-subject-card.goal-good{border-color:#22c55e}.dashboard-subject-card.goal-bad{border-color:#ef4444}
+.dashboard-subject-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}.dashboard-subject-title{display:flex;align-items:center;gap:8px;min-width:0}.dashboard-subject-title .subject-dot{width:9px;height:9px;box-shadow:0 0 0 3px color-mix(in srgb,var(--subject-color) 14%,transparent)}.dashboard-subject-title strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dashboard-subject-open{width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--subject-color) 11%,var(--card));color:var(--subject-color);display:grid;place-items:center;font-size:17px;font-weight:950;flex:0 0 auto}
+.dashboard-subject-main{display:grid;grid-template-columns:67px minmax(0,1fr);gap:8px;align-items:center;margin:10px 0 8px}.dashboard-subject-score span{display:block;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.035em}.dashboard-subject-score strong{display:block;color:var(--subject-color);font-size:29px;letter-spacing:-.055em;line-height:1.03;margin-top:2px}.dashboard-subject-trend{display:inline-grid;place-items:center;width:20px;height:20px;margin-top:4px;border-radius:7px;background:var(--bg);color:var(--muted);font-size:13px;font-weight:950}.dashboard-subject-trend.up{background:#ecfdf3;color:#15803d}.dashboard-subject-trend.down{background:#fef2f2;color:#b91c1c}
+.subject-sparkline{margin:0;padding:3px 4px 1px;border-radius:10px;background:color-mix(in srgb,var(--bg) 76%,var(--card));border:1px solid color-mix(in srgb,var(--subject-color) 11%,var(--line));overflow:hidden}.subject-sparkline svg{display:block;width:100%;height:48px}.subject-chart-empty{min-height:48px;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:9px;font-weight:800;line-height:1.2;padding:3px}
+.dashboard-subject-meta{display:flex;align-items:center;justify-content:space-between;gap:7px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--subject-color) 12%,var(--line));font-size:10px;color:var(--muted)}.dashboard-subject-meta span{white-space:nowrap}.dashboard-subject-meta strong{color:var(--text);font-size:11px}
+
+/* Detailansicht eines Fachs */
+.subject-detail-hero{--subject-color:var(--brand);padding:18px;border:1px solid color-mix(in srgb,var(--subject-color) 28%,var(--line));border-radius:18px;background:linear-gradient(145deg,color-mix(in srgb,var(--subject-color) 10%,var(--card)),var(--card));margin-bottom:16px}.subject-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.subject-detail-title{display:flex;align-items:center;gap:11px}.subject-detail-title h3{margin:0;font-size:22px}.subject-detail-title p{margin:2px 0 0;color:var(--muted);font-size:12px}.subject-detail-average{text-align:right}.subject-detail-average span{display:block;color:var(--muted);font-size:11px;font-weight:850}.subject-detail-average strong{display:block;color:var(--subject-color);font-size:38px;line-height:1.05}.subject-detail-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}.subject-detail-kpi{padding:10px;border-radius:13px;background:var(--card);border:1px solid var(--line)}.subject-detail-kpi span{display:block;color:var(--muted);font-size:10px;font-weight:850}.subject-detail-kpi strong{display:block;margin-top:2px}.subject-detail-chart{margin-top:15px;padding:10px;border-radius:15px;background:var(--card);border:1px solid var(--line);overflow:hidden}.subject-detail-chart svg{display:block;width:100%;height:auto}.subject-grade-list{display:grid;gap:8px}.subject-grade-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 13px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.subject-grade-row strong,.subject-grade-row span{display:block}.subject-grade-row small{display:block;color:var(--muted);margin-top:2px}.subject-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+
+@media(max-width:1180px){.dashboard-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:880px){.dashboard-subject-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Kompaktere Smartphone-Darstellung */
+@media(max-width:790px){
+ .main{padding-bottom:68px}.topbar{height:55px;padding:0 10px}.topbar strong{font-size:16px}.top-actions{gap:5px}.icon-btn{width:37px;height:37px;border-radius:11px;font-size:18px}.content{padding:12px 9px}
+ .page-head{gap:10px;margin-bottom:14px;padding-bottom:11px!important}.page-head h1{font-size:25px;margin:3px 0 3px}.page-head p{font-size:12px;line-height:1.4}.eyebrow{font-size:10px}.main .page-head:after{height:4px;width:55px}
+ .card,body.primary-mode .card{padding:13px;border-radius:16px}.btn,body.primary-mode .btn{min-height:39px;padding:8px 11px;border-radius:11px;font-size:13px}.btn-sm{min-height:34px!important;padding:6px 9px!important;font-size:11px!important}.select,.input{min-height:41px;padding:8px 10px;border-radius:11px}
+ .section-head{margin:18px 0 8px;gap:8px;align-items:flex-end}.section-head h2{font-size:17px}.section-head p{font-size:11px;line-height:1.35}.dashboard-subject-section-head .btn{display:none}
+ .dashboard-hero{min-height:0;padding:15px!important;grid-template-columns:1fr}.dashboard-hero h1{font-size:27px;margin:9px 0}.dashboard-hero p{font-size:12px;line-height:1.45}.dashboard-hero .actions{margin-top:13px}.hero-illustration{display:none}.hero-badges{gap:5px}.hero-badges .badge{font-size:9px;padding:4px 7px}
+ .overview-pack-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.overview-pack{min-height:145px;padding:13px 11px;border-radius:16px}.overview-pack:before{height:4px}.overview-pack .pack-icon{width:34px;height:34px;border-radius:10px;font-size:17px}.overview-pack h3{font-size:14px;line-height:1.15;max-width:100%;margin:7px 0 4px}.overview-pack p{font-size:10px;line-height:1.3;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pack-features,.overview-pack .pack-art{display:none}.overview-pack .pack-link{left:11px;bottom:10px;font-size:10px}
+ .status-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}.status-card{min-height:128px!important;padding:11px;border-radius:16px}.status-card:after{width:75px;height:75px}.status-card-head{gap:7px}.status-symbol{width:31px;height:31px;border-radius:10px;font-size:16px}.status-label{font-size:10px}.status-number{font-size:28px;margin:9px 0 0}.status-copy{font-size:9px;line-height:1.25;min-height:23px}.status-trend{margin-top:5px;min-height:20px}.status-trend .trend-badge{padding:3px 5px;font-size:8px}.status-meter{height:6px;margin-top:7px}.status-scale{font-size:8px;margin-top:3px}
+ .dashboard-subject-panel{padding:8px;border-radius:16px}.dashboard-subject-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dashboard-subject-card{min-height:132px;padding:9px;border-radius:13px}.dashboard-subject-card:before{height:3px}.dashboard-subject-title{gap:5px}.dashboard-subject-title strong{font-size:11px}.dashboard-subject-title .subject-dot{width:7px;height:7px;box-shadow:0 0 0 2px color-mix(in srgb,var(--subject-color) 14%,transparent)}.dashboard-subject-open{width:22px;height:22px;border-radius:7px;font-size:14px}.dashboard-subject-main{grid-template-columns:46px minmax(0,1fr);gap:5px;margin:7px 0 6px}.dashboard-subject-score span{font-size:7px}.dashboard-subject-score strong{font-size:22px}.dashboard-subject-trend{width:17px;height:17px;font-size:10px;margin-top:2px}.subject-sparkline{padding:2px}.subject-sparkline svg{height:38px}.subject-chart-empty{min-height:38px;font-size:7px}.dashboard-subject-meta{gap:4px;padding-top:6px;font-size:8px}.dashboard-subject-meta strong{font-size:9px}
+ .mini-timeline{gap:7px}.timeline-row{grid-template-columns:34px 1fr auto;gap:8px;padding:9px;border-radius:11px}.timeline-icon{width:34px;height:34px;border-radius:10px;font-size:15px}.timeline-row strong{font-size:12px}.timeline-row .muted{font-size:9px}.grade-pill{min-width:38px;height:30px;border-radius:8px;font-size:12px}
+ .bottom-nav{padding:4px 4px max(4px,env(safe-area-inset-bottom))}.bottom-nav button{min-height:52px;font-size:9px}.bottom-nav button span{font-size:18px}
+ .planning-tabs,.goal-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}.planning-tab{min-height:59px;padding:8px;grid-template-columns:32px minmax(0,1fr) 12px}.planning-tab-icon{width:32px;height:32px;font-size:15px}.planning-tab-copy strong{font-size:11px}.planning-tab-copy small{font-size:8px}.goal-overview-card{padding:11px;border-radius:14px}.goal-overview-card strong{font-size:23px}.goal-overview-top{font-size:9px}.goal-overview-icon{width:28px;height:28px;font-size:14px}
+ .modal-backdrop{padding:8px}.modal{border-radius:17px;max-height:95vh}.modal-head{padding:12px 13px}.modal-head h2{font-size:18px}.modal-body{padding:13px}.modal-foot{padding:10px 13px}.subject-detail-hero{padding:12px;border-radius:14px}.subject-detail-title h3{font-size:18px}.subject-detail-average strong{font-size:29px}.subject-detail-kpis{grid-template-columns:repeat(3,1fr);gap:5px}.subject-detail-kpi{padding:7px}.subject-detail-kpi strong{font-size:11px}.subject-detail-chart{padding:5px;margin-top:9px}.subject-grade-row{padding:9px 10px;border-radius:11px}.subject-grade-row strong{font-size:12px}.subject-grade-row small{font-size:9px}
+}
+@media(max-width:370px){.dashboard-subject-grid{grid-template-columns:1fr}.overview-pack-grid{grid-template-columns:1fr 1fr}.dashboard-subject-card{min-height:126px}.status-copy{display:none}.status-card{min-height:108px!important}}
+
+
+
+/* Umfangreiche, responsive Statistikzentrale */
+.stats-toolbar{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:17px}
+.stats-filter-group{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.stats-filter{min-width:180px}.stats-filter label{display:block;margin-bottom:6px}
+.stats-kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:17px}
+.stats-kpi{--stat-accent:#2563eb;position:relative;overflow:hidden;min-height:137px;padding:15px;border:1px solid color-mix(in srgb,var(--stat-accent) 20%,var(--line));border-radius:18px;background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--stat-accent) 7%,var(--card)));box-shadow:var(--shadow)}
+.stats-kpi:nth-child(2){--stat-accent:#16a34a}.stats-kpi:nth-child(3){--stat-accent:#dc2626}.stats-kpi:nth-child(4){--stat-accent:#7c3aed}.stats-kpi:nth-child(5){--stat-accent:#f97316}.stats-kpi:nth-child(6){--stat-accent:#0891b2}
+.stats-kpi-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--stat-accent) 12%,var(--card));color:var(--stat-accent);font-weight:950;font-size:17px}
+.stats-kpi-label{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.045em;margin-top:9px}.stats-kpi-value{font-size:29px;font-weight:950;letter-spacing:-.045em;color:var(--stat-accent);line-height:1.05;margin-top:3px}.stats-kpi-note{font-size:11px;color:var(--muted);margin-top:5px}
+.stats-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.75fr);gap:17px;margin-bottom:17px}.stats-layout.equal{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stats-chart-card{padding:18px;min-width:0}.stats-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}.stats-card-head h2{font-size:19px;margin:0}.stats-card-head p{font-size:12px;color:var(--muted);margin:2px 0 0}.stats-chart{width:100%;overflow:hidden}.stats-chart svg{display:block;width:100%;height:auto;min-height:180px}
+.stats-empty{min-height:210px;display:grid;place-items:center;text-align:center;color:var(--muted);background:var(--bg);border-radius:15px;padding:20px}
+.stats-distribution{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;align-items:end;height:230px;padding:12px 5px 0}.stats-bin{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px;min-width:0}.stats-bin strong{font-size:12px}.stats-bar-track{height:165px;width:100%;max-width:46px;border-radius:10px 10px 5px 5px;background:var(--bg);display:flex;align-items:flex-end;overflow:hidden}.stats-bar-fill{width:100%;min-height:3px;border-radius:9px 9px 4px 4px;background:linear-gradient(180deg,var(--section-accent),color-mix(in srgb,var(--section-accent) 68%,#fff))}.stats-bin span{font-size:9px;color:var(--muted);font-weight:850;white-space:nowrap}
+.stats-ring-wrap{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;min-height:210px}.stats-ring{--ring-value:0;width:145px;height:145px;border-radius:50%;background:conic-gradient(#16a34a var(--ring-value),#ef4444 0);display:grid;place-items:center;position:relative}.stats-ring:after{content:"";width:101px;height:101px;border-radius:50%;background:var(--card);position:absolute}.stats-ring-label{position:relative;z-index:1;text-align:center}.stats-ring-label strong{display:block;font-size:29px}.stats-ring-label span{font-size:11px;color:var(--muted)}.stats-legend{display:grid;gap:10px}.stats-legend-row{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:9px 10px;border-radius:12px;background:var(--bg)}.stats-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}
+.stats-ranking{display:grid;gap:8px}.stats-rank-row{--subject-color:var(--brand);display:grid;grid-template-columns:28px minmax(120px,1.2fr) minmax(110px,1fr) repeat(5,minmax(58px,.55fr));gap:9px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.stats-rank-row.header{background:var(--bg);border:0;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}.stats-rank-number{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--subject-color) 12%,var(--card));color:var(--subject-color);font-size:11px;font-weight:950}.stats-rank-subject{display:flex;align-items:center;gap:9px;min-width:0}.stats-rank-subject strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats-mini-progress{height:8px;border-radius:99px;background:var(--bg);overflow:hidden}.stats-mini-progress span{display:block;height:100%;border-radius:inherit;background:var(--subject-color)}.stats-cell{font-size:12px;font-weight:850}.stats-cell small{display:block;color:var(--muted);font-size:9px;font-weight:750}
+.stats-type-grid,.stats-month-grid{display:grid;gap:9px}.stats-type-row,.stats-month-row{display:grid;grid-template-columns:minmax(100px,1fr) 2fr auto;gap:10px;align-items:center}.stats-horizontal-track{height:10px;border-radius:99px;background:var(--bg);overflow:hidden}.stats-horizontal-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--section-accent),color-mix(in srgb,var(--section-accent) 65%,#fff))}.stats-type-row strong,.stats-month-row strong{font-size:12px}.stats-type-row span,.stats-month-row span{font-size:11px;color:var(--muted);text-align:right}
+.stats-insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stats-insight{padding:15px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}.stats-insight-icon{font-size:23px}.stats-insight strong{display:block;margin:7px 0 3px}.stats-insight p{font-size:12px;color:var(--muted);margin:0;line-height:1.45}
+@media(max-width:1200px){.stats-kpi-grid{grid-template-columns:repeat(3,1fr)}.stats-layout,.stats-layout.equal{grid-template-columns:1fr}.stats-rank-row{grid-template-columns:28px minmax(130px,1.2fr) minmax(100px,1fr) repeat(3,minmax(58px,.55fr))}.stats-rank-row>*:nth-child(7),.stats-rank-row>*:nth-child(8){display:none}}
+@media(max-width:790px){.stats-toolbar{align-items:stretch}.stats-filter-group{display:grid;grid-template-columns:1fr 1fr;width:100%}.stats-filter{min-width:0}.stats-kpi-grid{grid-template-columns:repeat(3,1fr);gap:8px}.stats-kpi{min-height:112px;padding:12px}.stats-kpi-icon{width:29px;height:29px;font-size:14px}.stats-kpi-label{font-size:9px;margin-top:6px}.stats-kpi-value{font-size:23px}.stats-kpi-note{font-size:9px}.stats-chart-card{padding:14px}.stats-chart svg{min-height:145px}.stats-distribution{height:190px;gap:4px}.stats-bar-track{height:125px}.stats-ring-wrap{grid-template-columns:112px 1fr;gap:12px;min-height:160px}.stats-ring{width:108px;height:108px}.stats-ring:after{width:75px;height:75px}.stats-ring-label strong{font-size:22px}.stats-ranking{overflow-x:auto;padding-bottom:3px}.stats-rank-row{min-width:640px}.stats-insights{grid-template-columns:1fr 1fr}.stats-type-row,.stats-month-row{grid-template-columns:minmax(82px,1fr) 1.5fr auto}}
+@media(max-width:500px){.stats-filter-group{grid-template-columns:1fr 1fr;gap:7px}.stats-filter label{font-size:10px}.stats-filter .select{min-height:39px;padding:7px 8px;font-size:12px}.stats-kpi-grid{grid-template-columns:repeat(2,1fr)}.stats-kpi{min-height:105px}.stats-layout{gap:11px;margin-bottom:11px}.stats-card-head h2{font-size:16px}.stats-card-head p{font-size:10px}.stats-chart-card{padding:12px}.stats-distribution{height:170px}.stats-bar-track{height:108px;max-width:34px}.stats-bin span{font-size:8px}.stats-ring-wrap{grid-template-columns:94px 1fr}.stats-ring{width:92px;height:92px}.stats-ring:after{width:64px;height:64px}.stats-ring-label strong{font-size:18px}.stats-legend-row{padding:7px 8px;font-size:11px}.stats-insights{grid-template-columns:1fr}.stats-type-row,.stats-month-row{grid-template-columns:80px 1fr 42px;gap:6px}.stats-type-row strong,.stats-month-row strong{font-size:10px}.stats-type-row span,.stats-month-row span{font-size:9px}}
+
+
+/* Mobile-Anmeldung und Ersteinrichtung: kompakt, scrollbar und tastatursicher */
+:root{--app-height:100dvh}
+html,body{min-height:100%;max-width:100%;overflow-x:hidden}
+.auth,.onboarding-shell{overscroll-behavior:contain}
+
+@media(max-width:790px){
+  .auth{
+    min-height:var(--app-height,100dvh);
+    height:auto;
+    display:block;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:var(--card);
+  }
+  .auth-panel{
+    display:block;
+    min-height:var(--app-height,100dvh);
+    padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));
+    overflow:visible;
+  }
+  .auth-card{
+    width:min(100%,470px);
+    margin:0 auto;
+    padding:4px 0 12px;
+  }
+  .auth-card>.brand{margin-bottom:16px!important}
+  .auth-card #authTitle{font-size:clamp(27px,8vw,34px);line-height:1.08}
+  .auth-card #authSub{margin:7px 0 14px;font-size:14px}
+  .auth-card .tabs{margin:14px 0;padding:4px}
+  .auth-card .tab{min-height:42px;padding:8px 7px;font-size:13px}
+  .auth-card .form{gap:10px}
+  .auth-card .field{gap:5px}
+  .auth-card label{font-size:12px}
+  .auth-card .input{min-height:46px;font-size:16px;padding:9px 11px}
+  .auth-card .btn{min-height:46px}
+  #authMsg .message{margin:8px 0;font-size:13px}
+
+  .onboarding-shell{
+    width:100%;
+    height:var(--app-height,100dvh);
+    min-height:0;
+    padding:0;
+    overflow:hidden;
+    display:block;
+  }
+  .onboarding-card{
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:none;
+    border:0;
+    border-radius:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .onboarding-side{
+    flex:0 0 auto;
+    min-height:0;
+    padding:max(11px,env(safe-area-inset-top)) 14px 9px;
+  }
+  .onboarding-side .brand{margin:0}
+  .onboarding-side .logo{width:36px;height:36px;border-radius:12px}
+  .onboarding-side .logo svg{width:25px;height:25px}
+  .onboarding-side .brand-word{font-size:18px}
+  .onboarding-steps{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    margin-top:9px;
+    overflow:visible;
+  }
+  .onboarding-step{
+    min-width:0;
+    width:auto;
+    gap:0;
+    font-size:0;
+  }
+  .onboarding-step span{
+    width:27px;
+    height:27px;
+    flex:0 0 27px;
+    font-size:11px;
+  }
+  .onboarding-main{
+    flex:1 1 auto;
+    min-height:0;
+    padding:16px 15px 0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .onboarding-content{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding:0 2px 18px;
+    scroll-padding-bottom:24px;
+  }
+  .onboarding-main h1{font-size:clamp(25px,7.2vw,31px);line-height:1.08;margin:2px 0 7px}
+  .onboarding-main .muted{font-size:13px;line-height:1.42}
+  .onboarding-main .setup-grid{margin-top:16px!important;gap:10px}
+  .onboarding-main .setup-option{padding:11px}
+  .onboarding-main .input,.onboarding-main .select{min-height:44px;font-size:16px;padding:8px 10px}
+  .onboarding-main label{font-size:12px}
+  .onboarding-main .subject-choice-grid{max-height:none;overflow:visible;gap:8px}
+  .onboarding-main .subject-choice label{min-height:46px;padding:8px 10px;font-size:13px}
+  .onboarding-main .card.flat{margin-top:16px!important;padding:14px}
+  .onboarding-main #targetPreview{font-size:52px!important}
+  .onboarding-main .setup-summary{margin-top:16px!important;gap:8px}
+  .onboarding-main .setup-summary .mini{padding:11px}
+  .onboarding-main .notice{margin-top:12px!important;padding:11px 12px}
+  .onboarding-foot{
+    flex:0 0 auto;
+    position:relative;
+    z-index:3;
+    margin:0 -15px;
+    padding:11px 15px max(11px,env(safe-area-inset-bottom));
+    gap:9px;
+    background:var(--card);
+    border-top:1px solid var(--line);
+    box-shadow:0 -9px 24px rgba(24,32,51,.08);
+  }
+  .onboarding-foot .btn{min-height:46px;padding:9px 12px}
+  .onboarding-foot #setupNext{flex:1}
+  .onboarding-foot #setupBack{flex:0 0 auto}
+
+  .tour-card{
+    left:10px;
+    right:10px;
+    bottom:max(84px,calc(env(safe-area-inset-bottom) + 74px));
+    width:auto;
+    max-height:calc(var(--app-height,100dvh) - 110px);
+    overflow-y:auto;
+    padding:15px;
+  }
+  .tour-card h2{font-size:20px}
+  .tour-card p{font-size:13px}
+  .tour-actions{align-items:stretch}
+  .tour-actions>.actions{width:auto}
+}
+
+@media(max-width:390px){
+  .auth-panel{padding-left:12px;padding-right:12px}
+  .auth-card .brand-word small{display:none}
+  .onboarding-main{padding-left:12px;padding-right:12px}
+  .onboarding-foot{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
+  .onboarding-foot .btn{font-size:13px}
+}
+
+@media(max-width:790px) and (max-height:680px){
+  .onboarding-side{padding-top:max(7px,env(safe-area-inset-top));padding-bottom:6px}
+  .onboarding-side .brand{display:none}
+  .onboarding-steps{margin-top:0}
+  .onboarding-step span{width:24px;height:24px;flex-basis:24px}
+  .onboarding-main{padding-top:11px}
+  .onboarding-main h1{font-size:24px}
+  .onboarding-content{padding-bottom:10px}
+  .onboarding-foot{padding-top:8px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+}
+
+</style>
+</head>
+<body>
+<div id="auth" class="auth">
+  <section class="auth-hero">
+    <div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="logo-plane" d="M9 30.5 39 9 29.5 39 23 28.5 9 30.5Z"/><path class="logo-fold" d="M23 28.5 39 9"/><path class="logo-route" d="M8.5 39c6.5-.4 11.2-3 15.2-8.2"/><circle class="logo-dot" cx="8.5" cy="39" r="2.7"/></svg></div><span class="brand-word">NotenPilot <small>Schweiz</small></span></div>
+    <div>
+      <h1>Deine Noten.<br>Einfach erklärt.</h1>
+      <p>Eine übersichtliche Noten-App, die sich automatisch an Primarschule und Sekundarstufe anpasst.</p>
+      <div class="auth-points">
+        <div class="auth-point"><span class="check">✓</span> Für Primar- und Sekundarschule geeignet</div>
+        <div class="auth-point"><span class="check">✓</span> Noten, Ziele, Zeugnis und Projekte</div>
+        <div class="auth-point"><span class="check">✓</span> Alle Daten bleiben lokal auf deinem Gerät</div>
+      </div>
+    </div>
+    <small>NotenPilot Schweiz</small>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="brand" style="margin-bottom:25px"><div class="logo" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="logo-plane" d="M9 30.5 39 9 29.5 39 23 28.5 9 30.5Z"/><path class="logo-fold" d="M23 28.5 39 9"/><path class="logo-route" d="M8.5 39c6.5-.4 11.2-3 15.2-8.2"/><circle class="logo-dot" cx="8.5" cy="39" r="2.7"/></svg></div><span class="brand-word">NotenPilot <small>Schweiz</small></span></div>
+      <h1 id="authTitle" style="margin:0">Willkommen zurück</h1>
+      <p id="authSub" class="muted">Melde dich bei deinem lokalen Konto an.</p>
+      <div class="tabs">
+        <button type="button" class="tab active" data-auth="login">Anmelden</button>
+        <button type="button" class="tab" data-auth="register">Konto erstellen</button>
+      </div>
+      <div id="authMsg"></div>
+      <form id="loginForm" class="form">
+        <div class="field full"><label>E-Mail-Adresse oder Username</label><input class="input" name="login" required autocomplete="username"></div>
+        <div class="field full"><label>Passwort</label><input class="input" name="password" type="password" required autocomplete="current-password"></div>
+        <div class="field full"><button type="submit" class="btn btn-primary btn-block">Anmelden</button></div>
+      </form>
+      <form id="registerForm" class="form hidden">
+        <div class="field full"><label>E-Mail-Adresse</label><input class="input" name="email" type="email" required autocomplete="email"></div>
+        <div class="field full"><label>Username</label><input class="input" name="username" minlength="3" required></div>
+        <div class="field full"><label>Passwort</label><input class="input" name="password" type="password" minlength="6" required autocomplete="new-password"></div>
+        <div class="field full"><button type="submit" class="btn btn-primary btn-block">Konto erstellen und einrichten</button></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head"><div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="logo-plane" d="M9 30.5 39 9 29.5 39 23 28.5 9 30.5Z"/><path class="logo-fold" d="M23 28.5 39 9"/><path class="logo-route" d="M8.5 39c6.5-.4 11.2-3 15.2-8.2"/><circle class="logo-dot" cx="8.5" cy="39" r="2.7"/></svg></div><span class="brand-word">NotenPilot</span></div><button id="sidebarCollapseBtn" class="sidebar-toggle" type="button" title="Seitenleiste verkleinern" aria-label="Seitenleiste verkleinern">‹</button></div>
+    <nav id="sideNav" class="nav"></nav>
+    <button id="sidebarResizeHandle" class="sidebar-resizer" type="button" title="Ziehen, um die Breite zu ändern" aria-label="Breite der Seitenleiste ändern"></button>
+    <div class="side-profile">
+      <div id="sideAvatar" class="avatar"></div>
+      <div><strong id="sideName"></strong><span id="sideClass"></span></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <strong id="topTitle">Übersicht</strong>
+      <div class="top-actions">
+        <span id="schoolYearBadge" class="badge brand"></span>
+        <span class="badge good">● Lokal gespeichert</span>
+        <button id="quickAdd" class="icon-btn" title="Neue Note">＋</button>
+        <button id="themeBtn" class="icon-btn" title="Darstellung">◐</button>
+      </div>
+    </header>
+    <main id="content" class="content"></main>
+  </div>
+  <nav id="bottomNav" class="bottom-nav"></nav>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot" class="toast-wrap"></div>
+<div id="onboardingRoot"></div>
+<div id="tourRoot"></div>
+
+<script>
+(()=>{"use strict";
+const APP_KEY="notenpilot-schweiz-single-v1",SESSION_KEY="notenpilot-session-v1";
+const PREMIUM_CODE="J090092011LN",FREE_PROJECT_LIMIT=3;
+const COLORS=["#e11d48","#f97316","#ca8a04","#16a34a","#059669","#0891b2","#2563eb","#4f46e5","#7c3aed","#9333ea","#ec4899","#64748b"];
+const PRIMARY_SUBJECTS=["Deutsch","Mathematik","Natur, Mensch, Gesellschaft","Englisch","Französisch","Bildnerisches Gestalten","Textiles und Technisches Gestalten","Musik","Bewegung und Sport","Medien und Informatik","Religionen, Kulturen, Ethik"];
+const SECONDARY_SUBJECTS=["Deutsch","Mathematik","Englisch","Französisch","Natur und Technik","Geschichte","Geografie","Bildnerisches Gestalten","Textiles und Technisches Gestalten","Musik","Bewegung und Sport","Medien und Informatik","Wirtschaft, Arbeit, Haushalt","Berufliche Orientierung"];
+const SUBJECT_COLOR_PRESETS={
+ "deutsch":"#e11d48","mathematik":"#2563eb","math":"#2563eb",
+ "natur, mensch, gesellschaft":"#10b981","nmg":"#10b981","natur und technik":"#16a34a","nt":"#16a34a",
+ "englisch":"#7c3aed","französisch":"#ec4899","franzoesisch":"#ec4899",
+ "geschichte":"#b45309","geografie":"#0891b2","geographie":"#0891b2",
+ "bildnerisches gestalten":"#f97316","bg":"#f97316",
+ "textiles und technisches gestalten":"#64748b","ttg":"#64748b",
+ "musik":"#9333ea","bewegung und sport":"#059669","sport":"#059669",
+ "medien und informatik":"#4f46e5","informatik":"#4f46e5",
+ "wirtschaft, arbeit, haushalt":"#ca8a04","wah":"#ca8a04",
+ "berufliche orientierung":"#0f766e","bo":"#0f766e",
+ "religionen, kulturen, ethik":"#a855f7","rke":"#a855f7"
+};
+const COLOR_NAMES={"#e11d48":"Rot","#f97316":"Orange","#ca8a04":"Gold","#16a34a":"Grün","#10b981":"Mintgrün","#059669":"Smaragd","#0f766e":"Petrol","#0891b2":"Türkis","#2563eb":"Blau","#4f46e5":"Indigo","#7c3aed":"Violett","#9333ea":"Purpur","#a855f7":"Lila","#ec4899":"Pink","#b45309":"Braun","#64748b":"Schiefergrau"};
+const NAV_BASE=[
+ ["dashboard","⌂","Übersicht"],["subjects","▤","Fächer"],["grades","＋","Noten"],["report","▦","Zeugnis"],["goals","◎","Ziele"],
+ ["calendar","▣","Prüfungskalender"],["statistics","◫","Statistiken"],["planner","◇","Notenplaner"],["projects","◷","Projekte"],
+ ["coach","✦","KI-Coach"],["help","?","Hilfe"],["settings","⚙","Einstellungen"],["premium","♛","Premium"]
+];
+const NAV_GROUPS=[
+ {id:"school",icon:"📚",label:"Fächer & Leistungen",views:["subjects","grades","report"]},
+ {id:"planning",icon:"🎯",label:"Ziele & Planung",views:["goals","calendar","planner","projects"]},
+ {id:"insights",icon:"📊",label:"Auswertung & Coach",views:["statistics","coach"]},
+ {id:"account",icon:"⚙",label:"Konto & App",views:["help","settings","premium"]}
+];
+const PRIMARY_IDS=["dashboard","subjects","grades","report","goals","projects","help","settings","premium"];
+const SECONDARY_IDS=NAV_BASE.map(x=>x[0]);
+let store=loadStore(),user=null,data=null,view="dashboard",openNavGroup="school",onboardingStep=0,onboardingDraft=null,tourState=null;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const uid=()=>crypto.randomUUID?crypto.randomUUID():"id-"+Date.now()+"-"+Math.random().toString(16).slice(2);
+const esc=v=>String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#039;",'"':"&quot;"}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const fmt=(n,d=2)=>Number.isFinite(Number(n))?Number(n).toLocaleString("de-CH",{minimumFractionDigits:d,maximumFractionDigits:d}):"–";
+const dateFmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("de-CH"):"–";
+function rolloverParts(value="07-15"){const [m,d]=String(value).split("-").map(Number);return{month:m||7,day:d||15}}
+function academicYearStartYear(date=new Date(),rollover=data?.settings?.classRollover||"07-15"){
+ const {month,day}=rolloverParts(rollover),boundary=new Date(date.getFullYear(),month-1,day,0,0,0,0);return date>=boundary?date.getFullYear():date.getFullYear()-1;
+}
+function academicYearLabel(date=new Date(),rollover=data?.settings?.classRollover||"07-15"){const y=academicYearStartYear(date,rollover);return`${y}/${String(y+1).slice(-2)}`}
+function classIndex(level,classLevel){const n=Math.max(1,parseInt(classLevel,10)||1);return level==="Sekundarstufe"?Math.min(9,6+n):Math.min(6,n)}
+function classFromIndex(index){const n=Math.max(1,Math.min(9,index));return n<=6?{schoolLevel:"Primarschule",classLevel:`${n}. Klasse`}:{schoolLevel:"Sekundarstufe",classLevel:`${n-6}. Klasse`}}
+function syncClassProgression(){
+ if(!user||!data||data.settings.autoAdvanceClass===false)return false;
+ const p=profile(),currentIndex=classIndex(p.schoolLevel,p.classLevel),year=academicYearStartYear(),tracking=data.settings.classTracking;
+ if(!tracking){data.settings.classTracking={baseIndex:currentIndex,baseAcademicYear:year};save();return false}
+ const nextIndex=Math.min(9,Math.max(1,+tracking.baseIndex+(year-(+tracking.baseAcademicYear||year))));
+ const next=classFromIndex(nextIndex),changed=next.schoolLevel!==p.schoolLevel||next.classLevel!==p.classLevel;
+ if(changed){
+  p.schoolLevel=next.schoolLevel;p.classLevel=next.classLevel;data.settings.lastAutomaticClassChange=new Date().toISOString();
+  const schoolYear=academicYearLabel(),existing=data.semesters.find(x=>x.kind==="Schuljahr"&&x.schoolYear===schoolYear);
+  let project=existing;if(!project){project={id:uid(),name:`Schuljahr ${schoolYear}`,kind:"Schuljahr",schoolYear,color:COLORS[data.semesters.length%COLORS.length],description:"Automatisch beim Klassenwechsel erstellt",autoCreated:true};data.semesters.push(project)}
+  data.activeSemesterId=project.id;data.settings.activeSemesterId=project.id;
+  currentSubjects().forEach(s=>{if(!data.goals.some(g=>g.subjectId===s.id&&g.semesterId===project.id))data.goals.push({id:uid(),subjectId:s.id,semesterId:project.id,target:+data.settings.overallTarget||5,active:true})});save();
+ }
+ return changed;
+}
+
+function loadStore(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(APP_KEY)||'{"accounts":[],"data":{}}');
+  if(!Array.isArray(raw.accounts))raw.accounts=[];
+  if(!raw.data||typeof raw.data!=="object")raw.data={};
+  return raw;
+ }catch{return{accounts:[],data:{}}}
+}
+function save(){localStorage.setItem(APP_KEY,JSON.stringify(store))}
+async function sha(text){
+ const bytes=new TextEncoder().encode(text);
+ const digest=await crypto.subtle.digest("SHA-256",bytes);
+ return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function defaultData(){
+ const pid=uid(),year=academicYearLabel(new Date(),"07-15");
+ return{
+  subjects:[],assessments:[],goals:[],plannedExams:[],reportGrades:[],
+  semesters:[{id:pid,name:`Schuljahr ${year}`,kind:"Schuljahr",schoolYear:year,color:COLORS[0],description:"Automatisch eingerichtetes Schuljahr"}],
+  activeSemesterId:pid,
+  settings:{theme:"light",accentColor:"#f97316",gradeMin:1,gradeMax:6,passingGrade:4,onboardingComplete:false,tourSeen:false,overallTarget:5,autoAdvanceClass:true,classRollover:"07-15",classTracking:null,sidebarWidth:280,sidebarCollapsed:false},
+  premium:{active:false},coachHistory:[]
+ };
+}
+function normalizeData(d){
+ const isExisting=!!d,hadOnboarding=!!(d?.settings&&Object.prototype.hasOwnProperty.call(d.settings,"onboardingComplete"));
+ const x=d&&typeof d==="object"?d:defaultData(),def=defaultData();
+ for(const key of ["subjects","assessments","goals","plannedExams","reportGrades","semesters","coachHistory"])if(!Array.isArray(x[key]))x[key]=def[key];
+ x.settings={...def.settings,...(x.settings||{})};
+ if(isExisting&&!hadOnboarding)x.settings.onboardingComplete=true;
+ x.premium={...def.premium,...(x.premium||{})};
+ if(!x.semesters.length)x.semesters=def.semesters;
+ x.activeSemesterId=x.activeSemesterId||x.settings.activeSemesterId||x.semesters[0].id;
+ x.settings.activeSemesterId=x.activeSemesterId;
+ x.subjects.forEach((s,i)=>{if(!/^#[0-9a-f]{6}$/i.test(String(s.color||""))){s.color=suggestedSubjectColor(s.name,i);s.colorSource="suggested"}});
+ return x;
+}
+function profile(){
+ user.profile=user.profile||{};
+ const p=user.profile;
+ if(/Primarklasse/i.test(p.schoolLevel||"")){
+  p.classLevel=p.classLevel||`${parseInt(p.schoolLevel,10)||1}. Klasse`;
+  p.schoolLevel="Primarschule";
+ }
+ if(/^\d+\.\s*Sekundarstufe/i.test(p.schoolLevel||"")){
+  p.classLevel=p.classLevel||`${parseInt(p.schoolLevel,10)||1}. Klasse`;
+  p.schoolLevel="Sekundarstufe";
+ }
+ return p;
+}
+function classNum(){return parseInt(profile().classLevel,10)||1}
+function isPrimary(){return profile().schoolLevel==="Primarschule"||/Primar/i.test(profile().schoolLevel||"")}
+function isLowerPrimary(){return isPrimary()&&classNum()<=4}
+function isUpperPrimary(){return isPrimary()&&classNum()>=5&&classNum()<=6}
+function premiumActive(){return !!(data?.premium?.active||data?.premium?.unlocked||data?.isPremium||user?.premium)}
+function coachVisible(){return !isLowerPrimary()&&premiumActive()}
+function visibleNav(){
+ let ids=isPrimary()?[...PRIMARY_IDS]:[...SECONDARY_IDS];
+ if(coachVisible()&&!ids.includes("coach"))ids.splice(5,0,"coach");
+ if(!coachVisible())ids=ids.filter(x=>x!=="coach");
+ return ids.map(id=>NAV_BASE.find(n=>n[0]===id)).filter(Boolean);
+}
+function allowedView(id){return visibleNav().some(n=>n[0]===id)}
+function activeProject(){return data.semesters.find(p=>p.id===data.activeSemesterId)||data.semesters[0]}
+function setActiveProject(id){if(data.semesters.some(p=>p.id===id)){data.activeSemesterId=id;data.settings.activeSemesterId=id;save();render()}}
+function currentSubjects(){return data.subjects.filter(s=>!s.archived)}
+function subject(id){return data.subjects.find(s=>s.id===id)}
+function projectAssessments(){return data.assessments.filter(a=>!a.semesterId||a.semesterId===activeProject().id)}
+function subjectAssessments(id){return projectAssessments().filter(a=>a.subjectId===id&&a.include!==false)}
+function averageFor(id){
+ const arr=subjectAssessments(id);if(!arr.length)return null;
+ const total=arr.reduce((s,a)=>s+(+a.grade||0)*(+a.weight||1),0),w=arr.reduce((s,a)=>s+(+a.weight||1),0);
+ return w?total/w:null;
+}
+function overallAverage(){
+ const vals=currentSubjects().map(s=>averageFor(s.id)).filter(v=>v!==null);
+ return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+}
+
+function weightedAverage(arr){
+ if(!arr.length)return null;
+ const total=arr.reduce((sum,a)=>sum+(+a.grade||0)*(+a.weight||1),0),weight=arr.reduce((sum,a)=>sum+(+a.weight||1),0);
+ return weight?total/weight:null;
+}
+function assessmentSortValue(a,index=0){
+ const raw=a.examDate||a.date||a.createdAt||"";
+ const stamp=Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+"T12:00:00":raw);
+ return Number.isFinite(stamp)?stamp:index;
+}
+function sortedAssessments(arr){return arr.map((a,index)=>({a,index})).sort((x,y)=>assessmentSortValue(x.a,x.index)-assessmentSortValue(y.a,y.index)||x.index-y.index).map(x=>x.a)}
+function trendFromAverages(current,previous,latest=null){
+ if(current===null||previous===null)return{direction:"new",delta:null,current,previous,latest};
+ const delta=current-previous;
+ if(delta>.0049)return{direction:"up",delta,current,previous,latest};
+ if(delta<-.0049)return{direction:"down",delta,current,previous,latest};
+ return{direction:"flat",delta:0,current,previous,latest};
+}
+function trendForSubject(id){
+ const arr=sortedAssessments(subjectAssessments(id));
+ const current=weightedAverage(arr);if(!arr.length)return{direction:"none",delta:null,current:null,previous:null,latest:null};
+ if(arr.length===1)return{direction:"new",delta:null,current,previous:null,latest:arr[0]};
+ return trendFromAverages(current,weightedAverage(arr.slice(0,-1)),arr[arr.length-1]);
+}
+function overallTrend(){
+ const all=projectAssessments().filter(a=>a.include!==false).map((a,index)=>({a,index}));
+ if(!all.length)return{direction:"none",delta:null,current:null,previous:null,latest:null};
+ all.sort((x,y)=>assessmentSortValue(x.a,x.index)-assessmentSortValue(y.a,y.index)||x.index-y.index);
+ const latest=all[all.length-1].a,current=overallAverage();
+ if(all.length===1)return{direction:"new",delta:null,current,previous:null,latest};
+ const values=currentSubjects().map(s=>weightedAverage(subjectAssessments(s.id).filter(a=>a.id!==latest.id))).filter(v=>v!==null);
+ const previous=values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
+ return trendFromAverages(current,previous,latest);
+}
+function trendBadge(trend,long=false){
+ if(!trend||trend.direction==="none")return`<span class="trend-badge trend-flat"><span class="trend-arrow">→</span>Noch kein Trend</span>`;
+ if(trend.direction==="new")return`<span class="trend-badge trend-flat"><span class="trend-arrow">→</span>Erste Note</span>`;
+ if(trend.direction==="up")return`<span class="trend-badge trend-up"><span class="trend-arrow">↑</span>${long?`Schnitt +${fmt(Math.abs(trend.delta),2)}`:`+${fmt(Math.abs(trend.delta),2)}`}</span>`;
+ if(trend.direction==="down")return`<span class="trend-badge trend-down"><span class="trend-arrow">↓</span>${long?`Schnitt −${fmt(Math.abs(trend.delta),2)}`:`−${fmt(Math.abs(trend.delta),2)}`}</span>`;
+ return`<span class="trend-badge trend-flat"><span class="trend-arrow">→</span>Unverändert</span>`;
+}
+function normalizeSubjectKey(name=""){return String(name).trim().toLocaleLowerCase("de-CH").replace(/\s+/g," ")}
+function suggestedSubjectColor(name,index=0){return SUBJECT_COLOR_PRESETS[normalizeSubjectKey(name)]||COLORS[index%COLORS.length]}
+function colorName(color){return COLOR_NAMES[String(color||"").toLowerCase()]||"individuelle Farbe"}
+function subjectColor(s,index=0){const fallback=suggestedSubjectColor(s?.name,index),value=String(s?.color||fallback);return/^#[0-9a-f]{6}$/i.test(value)?value:fallback}
+
+function subjectLineChart(id,compact=false){
+ const s=subject(id),arr=sortedAssessments(subjectAssessments(id)),index=Math.max(0,currentSubjects().findIndex(x=>x.id===id)),color=subjectColor(s,index),g=goalFor(id);
+ if(!arr.length)return`<div class="subject-chart-empty">Noch keine Noten für eine Statistik</div>`;
+ const width=compact?320:760,height=compact?82:230,padX=compact?10:42,padY=compact?9:24,innerW=width-padX*2,innerH=height-padY*2;
+ const x=i=>arr.length===1?width/2:padX+i*(innerW/(arr.length-1)),y=grade=>padY+(6-Math.max(1,Math.min(6,+grade||1)))/5*innerH;
+ const points=arr.map((a,i)=>`${x(i).toFixed(1)},${y(a.grade).toFixed(1)}`).join(" "),guides=(compact?[4,5,6]:[1,2,3,4,5,6]).map(n=>`<line x1="${padX}" y1="${y(n).toFixed(1)}" x2="${width-padX}" y2="${y(n).toFixed(1)}" stroke="currentColor" opacity="${n===4?'.18':'.08'}" stroke-width="1"/>${compact?"":`<text x="${padX-10}" y="${(y(n)+4).toFixed(1)}" text-anchor="end" font-size="11" fill="currentColor" opacity=".58">${n}</text>`}`).join("");
+ const goalLine=g?`<line x1="${padX}" y1="${y(g.target).toFixed(1)}" x2="${width-padX}" y2="${y(g.target).toFixed(1)}" stroke="#f97316" stroke-width="2" stroke-dasharray="6 5" opacity=".9"/>${compact?"":`<text x="${width-padX}" y="${(y(g.target)-6).toFixed(1)}" text-anchor="end" font-size="11" font-weight="800" fill="#f97316">Ziel ${fmt(g.target,1)}</text>`}`:"";
+ const dots=arr.map((a,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(a.grade).toFixed(1)}" r="${compact?3.6:5}" fill="${color}" stroke="var(--card)" stroke-width="2"><title>${esc(a.title||"Bewertung")}: ${fmt(a.grade,1)}</title></circle>`).join("");
+ const labels=!compact&&arr.length<=10?arr.map((a,i)=>`<text x="${x(i).toFixed(1)}" y="${Math.max(13,y(a.grade)-10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="850" fill="${color}">${fmt(a.grade,1)}</text>`).join(""):"";
+ return`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Notenverlauf in ${esc(s?.name||"diesem Fach")}"><g style="color:var(--muted)">${guides}</g>${goalLine}<polyline points="${points}" fill="none" stroke="${color}" stroke-width="${compact?4:5}" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+}
+
+function goalState(current,target){if(current===null||!Number.isFinite(+target))return"neutral";return current>=+target?"good":"bad"}
+function goalFor(id){return data.goals.find(g=>g.subjectId===id&&(!g.semesterId||g.semesterId===activeProject().id)&&g.active!==false)}
+function initials(){return(profile().displayName||user.username||"NP").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase()}
+function toast(text,bad=false){const el=document.createElement("div");el.className="toast"+(bad?" bad":"");el.textContent=text;$("#toastRoot").append(el);setTimeout(()=>el.remove(),2800)}
+function closeModal(){$("#modalRoot").innerHTML=""}
+function modal(title,body,foot=""){
+ $("#modalRoot").innerHTML=`<div class="modal-backdrop" data-close-modal><section class="modal" role="dialog" aria-modal="true"><header class="modal-head"><h2>${esc(title)}</h2><button class="icon-btn" data-close-modal>×</button></header><div class="modal-body">${body}</div>${foot?`<footer class="modal-foot">${foot}</footer>`:""}</section></div>`;
+ $("#modalRoot").querySelector(".modal").onclick=e=>e.stopPropagation();
+ $$("[data-close-modal]").forEach(x=>x.onclick=closeModal);
+}
+function pageHead(kicker,title,desc,actions=""){return`<header class="page-head"><div><div class="eyebrow">${esc(kicker)}</div><h1>${esc(title)}</h1><p>${esc(desc)}</p></div>${actions?`<div class="actions">${actions}</div>`:""}</header>`}
+function empty(icon,title,text,button=""){return`<section class="card empty"><div class="empty-inner"><div class="empty-icon">${icon}</div><h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>${button}</div></section>`}
+function classOptions(level,selected){
+ const max=level==="Primarschule"?6:3;let out="";
+ for(let i=1;i<=max;i++){const v=`${i}. Klasse`;out+=`<option ${v===selected?"selected":""}>${v}</option>`}
+ return out;
+}
+function gradeTone(g){if(g===null)return"";return +g>=4?"good":"bad"}
+
+function navItem(id){return NAV_BASE.find(n=>n[0]===id)}
+function visibleGroups(){const ids=new Set(visibleNav().map(n=>n[0]));return NAV_GROUPS.map(g=>({...g,items:g.views.filter(id=>ids.has(id)).map(navItem).filter(Boolean)})).filter(g=>g.items.length)}
+function tourDescription(id){return({
+ dashboard:"Die Übersicht zeigt dir allgemein, wo du stehst, und führt zu allen wichtigen Bereichen.",subjects:"Hier verwaltest du deine Schulfächer und siehst den Schnitt pro Fach.",grades:"Hier trägst du Prüfungen, Aufgaben und andere Bewertungen ein.",report:"Die Zeugnisseite erstellt eine persönliche Prognose deiner Zeugnisnoten.",goals:"Hier legst du deine Wunsch-Noten fest und vergleichst sie mit deinem aktuellen Stand.",calendar:"Im Prüfungskalender planst du kommende Tests und Abgaben.",statistics:"Die Statistiken fassen deine Entwicklung und Ergebnisse zusammen.",planner:"Der Notenplaner berechnet, welche nächste Note du ungefähr für dein Ziel brauchst.",projects:"Projekte trennen Schuljahre, Semester oder besondere Lernphasen voneinander.",coach:"Der Premium-Coach gibt dir Hinweise zu deinen Noten und Zielen.",help:"Die Hilfe erklärt die wichtigsten Funktionen und den Datenschutz.",settings:"Hier änderst du Profil, Klasse, automatische Aktualisierung, Farben und Darstellung.",premium:"Hier verwaltest du zusätzliche Premium-Funktionen."
+ })[id]||"Dieser Bereich unterstützt dich bei deiner Schulorganisation."}
+function dashboardIllustration(){return`<svg viewBox="0 0 520 360" role="img" aria-label="Illustration mit Noten, Büchern und Diagramm"><defs><linearGradient id="g1" x1="0" x2="1"><stop stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".72"/></linearGradient></defs><rect x="55" y="54" width="355" height="245" rx="28" fill="url(#g1)"/><rect x="82" y="86" width="205" height="22" rx="11" fill="var(--brand)" opacity=".24"/><rect x="82" y="126" width="118" height="105" rx="18" fill="#172033"/><path d="M102 207l28-33 29 16 26-45" fill="none" stroke="var(--brand)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><rect x="220" y="126" width="160" height="17" rx="8" fill="#cbd2dc"/><rect x="220" y="158" width="126" height="17" rx="8" fill="#dbe0e7"/><rect x="220" y="190" width="145" height="17" rx="8" fill="#dbe0e7"/><rect x="82" y="251" width="298" height="18" rx="9" fill="var(--brand)" opacity=".22"/><circle cx="402" cy="92" r="54" fill="var(--brand)"/><text x="402" y="109" text-anchor="middle" font-size="51" font-family="Arial" font-weight="900" fill="#fff">5.3</text><g transform="translate(355 225) rotate(-7)"><rect width="118" height="86" rx="16" fill="#101827"/><rect x="17" y="18" width="84" height="10" rx="5" fill="#fff" opacity=".7"/><rect x="17" y="39" width="61" height="10" rx="5" fill="var(--brand)"/><rect x="17" y="60" width="74" height="10" rx="5" fill="#fff" opacity=".45"/></g><circle cx="68" cy="307" r="25" fill="var(--brand)" opacity=".75"/><circle cx="455" cy="46" r="16" fill="#fff" opacity=".34"/></svg>`}
+function packIllustration(type){const a="var(--pack-accent,var(--brand))",soft="var(--pack-soft,var(--brandSoft))";const art={school:`<svg viewBox="0 0 170 135"><rect x="12" y="30" width="115" height="82" rx="18" fill="${soft}"/><rect x="30" y="14" width="119" height="82" rx="18" fill="${a}" opacity=".94"/><path d="M52 39h69M52 58h51M52 77h60" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="135" cy="105" r="25" fill="#172033"/><text x="135" y="113" text-anchor="middle" font-size="24" font-weight="900" fill="#fff">5.5</text></svg>`,planning:`<svg viewBox="0 0 180 140"><circle cx="71" cy="67" r="46" fill="${soft}"/><circle cx="71" cy="67" r="31" fill="none" stroke="${a}" stroke-width="11"/><circle cx="71" cy="67" r="10" fill="#172033"/><path d="M71 67l44-31" stroke="#172033" stroke-width="8" stroke-linecap="round"/><path d="M109 23l33-13-14 31z" fill="${a}"/><rect x="111" y="69" width="58" height="55" rx="13" fill="#172033"/><rect x="121" y="82" width="38" height="7" rx="4" fill="#fff" opacity=".8"/><path d="M122 101l8 8 16-19" fill="none" stroke="${a}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,insights:`<svg viewBox="0 0 170 135"><rect x="13" y="81" width="27" height="38" rx="8" fill="${a}" opacity=".42"/><rect x="52" y="55" width="27" height="64" rx="8" fill="${a}" opacity=".68"/><rect x="91" y="25" width="27" height="94" rx="8" fill="${a}"/><path d="M23 57l42-27 35 12 45-31" fill="none" stroke="#172033" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="145" cy="19" r="12" fill="${soft}" stroke="${a}" stroke-width="5"/></svg>`,account:`<svg viewBox="0 0 170 135"><circle cx="72" cy="54" r="35" fill="${a}"/><circle cx="72" cy="48" r="13" fill="#fff"/><path d="M47 78c9-22 41-22 50 0" fill="#fff"/><rect x="106" y="79" width="51" height="40" rx="13" fill="#172033"/><path d="M131 88v22M120 99h22" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>`};return art[type]||art.school}
+function planningIllustration(){return`<svg viewBox="0 0 280 175"><circle cx="84" cy="87" r="63" fill="var(--section-soft)"/><circle cx="84" cy="87" r="43" fill="none" stroke="var(--section-accent)" stroke-width="14"/><circle cx="84" cy="87" r="12" fill="#172033"/><path d="M84 87l62-42" stroke="#172033" stroke-width="10" stroke-linecap="round"/><path d="M139 26l45-17-19 42z" fill="var(--section-accent)"/><rect x="153" y="78" width="102" height="77" rx="18" fill="#172033"/><rect x="170" y="96" width="68" height="9" rx="5" fill="#fff" opacity=".75"/><rect x="170" y="116" width="49" height="9" rx="5" fill="var(--section-accent)"/><path d="M170 138h55" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".5"/></svg>`}
+function planningNav(active){
+ const items=[
+  {id:"goals",icon:"◎",title:"Ziele",text:"Wunsch-Noten verfolgen"},
+  {id:"calendar",icon:"▣",title:"Prüfungen",text:"Termine und Abgaben planen"},
+  {id:"planner",icon:"◇",title:"Notenplaner",text:"Nächste Ergebnisse berechnen"},
+  {id:"projects",icon:"◷",title:"Projekte",text:"Schuljahre sauber trennen"}
+ ].filter(x=>allowedView(x.id));
+ const activeGoals=data.goals.filter(g=>g.active!==false&&(!g.semesterId||g.semesterId===activeProject().id)).length;
+ const examCount=(data.plannedExams||[]).filter(x=>!x.semesterId||x.semesterId===activeProject().id).length;
+ return`<section class="planning-hub"><div><div class="eyebrow">Ziele & Planung</div><h2>Dein persönlicher Schulplan</h2><p>Verbinde Zielnoten, Termine, Berechnungen und Schuljahre in einem übersichtlichen Arbeitsbereich.</p><div class="planning-kpis"><span class="planning-kpi"><b>${activeGoals}</b> aktive Ziele</span><span class="planning-kpi"><b>${examCount}</b> geplante Termine</span><span class="planning-kpi"><b>${fmt(data.settings.overallTarget||5,1)}</b> allgemeines Ziel</span></div></div><div class="planning-hub-art">${planningIllustration()}</div></section><nav class="planning-tabs" aria-label="Bereiche von Ziele und Planung">${items.map(x=>`<button class="planning-tab ${active===x.id?"active":""}" data-go="${x.id}" ${active===x.id?'aria-current="page"':""}><span class="planning-tab-icon">${x.icon}</span><span class="planning-tab-copy"><strong>${x.title}</strong><small>${x.text}</small></span><span class="planning-tab-arrow">›</span></button>`).join("")}</nav>`
+}
+function applySidebarState(){
+ if(!data)return;
+ const width=Math.max(210,Math.min(390,+data.settings.sidebarWidth||280)),collapsed=!!data.settings.sidebarCollapsed;
+ document.body.classList.toggle("sidebar-collapsed",collapsed);
+ document.documentElement.style.setProperty("--side",collapsed?"88px":`${width}px`);
+ const button=$("#sidebarCollapseBtn");if(button){button.textContent="‹";button.title=collapsed?"Seitenleiste vergrössern":"Seitenleiste verkleinern";button.setAttribute("aria-label",button.title)}
+}
+function wireSidebarControls(){
+ const toggle=$("#sidebarCollapseBtn"),handle=$("#sidebarResizeHandle"),sidebar=$("#sidebar");if(!toggle||!handle||!sidebar)return;
+ toggle.onclick=()=>{data.settings.sidebarCollapsed=!data.settings.sidebarCollapsed;save();applySidebarState()};
+ handle.onpointerdown=e=>{if(window.innerWidth<=790)return;e.preventDefault();data.settings.sidebarCollapsed=false;applySidebarState();document.body.classList.add("sidebar-resizing");handle.setPointerCapture?.(e.pointerId);
+  const move=ev=>{const width=Math.max(210,Math.min(390,ev.clientX));data.settings.sidebarWidth=Math.round(width);document.documentElement.style.setProperty("--side",`${Math.round(width)}px`)};
+  const stop=()=>{document.body.classList.remove("sidebar-resizing");handle.removeEventListener("pointermove",move);handle.removeEventListener("pointerup",stop);handle.removeEventListener("pointercancel",stop);save()};
+  handle.addEventListener("pointermove",move);handle.addEventListener("pointerup",stop);handle.addEventListener("pointercancel",stop)
+ };
+}
+function openPackMenu(groupId){
+ const group=visibleGroups().find(g=>g.id===groupId);if(!group)return;
+ modal(group.label,`<div class="grid grid-2">${group.items.map(n=>`<button class="btn btn-secondary" data-pack-view="${n[0]}" style="justify-content:flex-start;min-height:61px"><span style="font-size:22px">${n[1]}</span>${esc(n[2])}</button>`).join("")}</div>`);
+ $$('[data-pack-view]').forEach(b=>b.onclick=()=>{view=b.dataset.packView;openNavGroup=groupId;closeModal();render();window.scrollTo({top:0,behavior:"smooth"})});
+}
+function resetClassTracking(){const p=profile();data.settings.classTracking={baseIndex:classIndex(p.schoolLevel,p.classLevel),baseAcademicYear:academicYearStartYear()}}
+function onboardingSteps(){return["Über dich","Dein Ziel","Deine Fächer","Darstellung","Fertig"]}
+function initOnboardingDraft(){
+ const p=profile(),defaults=(p.schoolLevel==="Sekundarstufe"?SECONDARY_SUBJECTS:PRIMARY_SUBJECTS).slice(0,p.schoolLevel==="Sekundarstufe"?8:6);
+ onboardingDraft={displayName:p.displayName||user.username,schoolName:p.schoolName||"",schoolLevel:p.schoolLevel||"Sekundarstufe",classLevel:p.classLevel||"1. Klasse",target:+data.settings.overallTarget||5,subjects:currentSubjects().map(s=>s.name),theme:data.settings.theme||"light",accentColor:data.settings.accentColor||COLORS[0],autoAdvanceClass:data.settings.autoAdvanceClass!==false,classRollover:data.settings.classRollover||"07-15"};
+ if(!onboardingDraft.subjects.length)onboardingDraft.subjects=defaults;
+}
+function showOnboarding(step=0){onboardingStep=Math.max(0,Math.min(4,step));if(!onboardingDraft)initOnboardingDraft();renderOnboarding()}
+function renderOnboarding(){
+ const steps=onboardingSteps(),d=onboardingDraft,allSubjects=d.schoolLevel==="Sekundarstufe"?SECONDARY_SUBJECTS:PRIMARY_SUBJECTS;
+ let body="";
+ if(onboardingStep===0)body=`<div class="eyebrow">Schritt 1</div><h1>Richte dein Profil ein</h1><p class="muted">Diese Angaben helfen NotenPilot, die passenden Seiten und Fächer anzuzeigen.</p><form id="setupForm" class="setup-grid" style="margin-top:25px"><div class="field full"><label>Dein Anzeigename</label><input class="input" name="displayName" value="${esc(d.displayName)}" required></div><div class="field full"><label>Schulhaus</label><input class="input" name="schoolName" value="${esc(d.schoolName)}" placeholder="z. B. Schulhaus Oberseen"></div><div class="field"><label>Schulstufe</label><select class="select" name="schoolLevel" id="onboardLevel"><option ${d.schoolLevel==="Primarschule"?"selected":""}>Primarschule</option><option ${d.schoolLevel==="Sekundarstufe"?"selected":""}>Sekundarstufe</option></select></div><div class="field"><label>Aktuelle Klasse</label><select class="select" name="classLevel" id="onboardClass">${classOptions(d.schoolLevel,d.classLevel)}</select></div></form>`;
+ if(onboardingStep===1)body=`<div class="eyebrow">Schritt 2</div><h1>Was ist dein Notenziel?</h1><p class="muted">Das Ziel wird für deine ausgewählten Fächer vorbereitet. Du kannst es später jederzeit ändern.</p><div class="card flat" style="margin-top:25px;text-align:center;background:var(--bg)"><div class="muted">Gewünschter Schnitt</div><div id="targetPreview" class="target" style="font-size:68px;font-weight:950;color:var(--brand2)">${fmt(d.target,1)}</div><input id="targetRange" type="range" min="3" max="6" step=".1" value="${d.target}" style="width:min(520px,100%);accent-color:var(--brand)"><div style="display:flex;justify-content:space-between;max-width:520px;margin:auto" class="muted"><span>3.0</span><span>6.0</span></div></div><div class="notice" style="margin-top:17px"><h3>Flexibel</h3><p>Du kannst das Ziel später pro Fach individuell anpassen.</p></div>`;
+ if(onboardingStep===2)body=`<div class="eyebrow">Schritt 3</div><h1>Wähle deine Fächer</h1><p class="muted">NotenPilot erstellt daraus direkt deine Fachübersicht.</p><div class="subject-choice-grid" style="margin-top:22px">${allSubjects.map((name,i)=>{const suggested=suggestedSubjectColor(name,i);return`<div class="subject-choice"><input id="sub-${i}" type="checkbox" value="${esc(name)}" ${d.subjects.includes(name)?"checked":""}><label for="sub-${i}"><span style="width:14px;height:14px;border-radius:50%;background:${suggested};box-shadow:0 0 0 4px color-mix(in srgb,${suggested} 14%,transparent);flex:0 0 auto"></span>${esc(name)}</label></div>`}).join("")}</div>`;
+ if(onboardingStep===3)body=`<div class="eyebrow">Schritt 4</div><h1>Wähle deine Darstellung</h1><p class="muted">Farbe, Hell-/Dunkelmodus und Klassenwechsel lassen sich später weiterhin ändern.</p><div class="setup-grid" style="margin-top:23px"><section class="setup-option"><h3>Darstellung</h3><div class="theme-grid"><button type="button" class="theme-choice ${d.theme==="light"?"active":""}" data-theme-choice="light">☀️ Hell</button><button type="button" class="theme-choice ${d.theme==="dark"?"active":""}" data-theme-choice="dark">🌙 Dunkel</button></div></section><section class="setup-option"><h3>Akzentfarbe</h3><div class="color-grid">${COLORS.map(c=>`<button type="button" class="color-choice ${d.accentColor===c?"active":""}" data-color-choice="${c}" style="background:${c}" title="${c}"></button>`).join("")}</div></section><section class="setup-option full"><h3>Klasse automatisch aktualisieren</h3><label class="switch"><input id="autoAdvanceChoice" type="checkbox" ${d.autoAdvanceClass?"checked":""}> Nach jedem Schuljahr automatisch eine Klasse weitergehen</label><div class="field" style="margin-top:13px"><label>Zeitpunkt des Klassenwechsels</label><select id="rolloverChoice" class="select"><option value="07-01" ${d.classRollover==="07-01"?"selected":""}>1. Juli</option><option value="07-15" ${d.classRollover==="07-15"?"selected":""}>15. Juli</option><option value="08-01" ${d.classRollover==="08-01"?"selected":""}>1. August</option><option value="08-15" ${d.classRollover==="08-15"?"selected":""}>15. August</option></select></div></section></div>`;
+ if(onboardingStep===4)body=`<div class="eyebrow">Bereit</div><h1>Dein NotenPilot ist eingerichtet</h1><p class="muted">Danach zeigen wir dir jede Seite kurz direkt in der App.</p><div class="setup-summary" style="margin-top:24px"><div class="mini"><span>Profil</span><strong>${esc(d.displayName)}</strong></div><div class="mini"><span>Klasse</span><strong>${esc(d.schoolLevel)} · ${esc(d.classLevel)}</strong></div><div class="mini"><span>Notenziel</span><strong>${fmt(d.target,1)}</strong></div><div class="mini"><span>Fächer</span><strong>${d.subjects.length} ausgewählt</strong></div><div class="mini"><span>Schuljahr</span><strong>${academicYearLabel(new Date(),d.classRollover)}</strong></div><div class="mini"><span>Automatisch</span><strong>${d.autoAdvanceClass?"Klassenwechsel aktiv":"Manuelle Klasse"}</strong></div></div><div class="notice" style="margin-top:18px"><h3>Geführte Einführung</h3><p>Beim Start wechselst du nacheinander durch alle verfügbaren Seiten. Unten rechts wird jeweils erklärt, wofür die Seite da ist.</p></div>`;
+ $("#onboardingRoot").innerHTML=`<div class="onboarding-shell"><section class="onboarding-card"><aside class="onboarding-side"><div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="logo-plane" d="M9 30.5 39 9 29.5 39 23 28.5 9 30.5Z"/><path class="logo-fold" d="M23 28.5 39 9"/><path class="logo-route" d="M8.5 39c6.5-.4 11.2-3 15.2-8.2"/><circle class="logo-dot" cx="8.5" cy="39" r="2.7"/></svg></div><span class="brand-word">NotenPilot</span></div><h2>In wenigen Schritten startklar.</h2><p>Wir richten die App passend zu deiner Schule, deinen Zielen und deinem Stil ein.</p><div class="onboarding-steps">${steps.map((s,i)=>`<div class="onboarding-step ${i===onboardingStep?"active":i<onboardingStep?"done":""}"><span>${i<onboardingStep?"✓":i+1}</span>${s}</div>`).join("")}</div></aside><main class="onboarding-main"><div class="onboarding-content">${body}</div><footer class="onboarding-foot"><button type="button" class="btn btn-secondary" id="setupBack" ${onboardingStep===0?"disabled":""}>Zurück</button><button type="button" class="btn btn-primary" id="setupNext">${onboardingStep===4?"App öffnen und Einführung starten":"Weiter"}</button></footer></main></section></div>`;
+ if($("#onboardLevel"))$("#onboardLevel").onchange=e=>{$("#onboardClass").innerHTML=classOptions(e.target.value,"")};
+ if($("#targetRange"))$("#targetRange").oninput=e=>{$("#targetPreview").textContent=fmt(+e.target.value,1)};
+ if($("#autoAdvanceChoice"))$("#autoAdvanceChoice").onchange=e=>{d.autoAdvanceClass=e.target.checked};if($("#rolloverChoice"))$("#rolloverChoice").onchange=e=>{d.classRollover=e.target.value};
+ $$('[data-theme-choice]').forEach(b=>b.onclick=()=>{d.theme=b.dataset.themeChoice;if($("#autoAdvanceChoice"))d.autoAdvanceClass=$("#autoAdvanceChoice").checked;if($("#rolloverChoice"))d.classRollover=$("#rolloverChoice").value;document.documentElement.dataset.theme=d.theme;renderOnboarding()});
+ $$('[data-color-choice]').forEach(b=>b.onclick=()=>{d.accentColor=b.dataset.colorChoice;if($("#autoAdvanceChoice"))d.autoAdvanceClass=$("#autoAdvanceChoice").checked;if($("#rolloverChoice"))d.classRollover=$("#rolloverChoice").value;document.documentElement.style.setProperty("--brand",d.accentColor);renderOnboarding()});
+ $("#setupBack").onclick=()=>{if(onboardingStep===1&&$("#targetRange"))d.target=+$("#targetRange").value;if(onboardingStep===2)d.subjects=$$('.subject-choice input:checked').map(x=>x.value);if(onboardingStep===3){d.autoAdvanceClass=$("#autoAdvanceChoice").checked;d.classRollover=$("#rolloverChoice").value}showOnboarding(onboardingStep-1)};$("#setupNext").onclick=advanceOnboarding;
+}
+function advanceOnboarding(){
+ const d=onboardingDraft;
+ if(onboardingStep===0){const form=$("#setupForm");if(!form.reportValidity())return;const fd=new FormData(form);d.displayName=String(fd.get("displayName")).trim();d.schoolName=String(fd.get("schoolName")).trim();const oldLevel=d.schoolLevel;d.schoolLevel=fd.get("schoolLevel");d.classLevel=fd.get("classLevel");if(oldLevel!==d.schoolLevel)d.subjects=(d.schoolLevel==="Sekundarstufe"?SECONDARY_SUBJECTS:PRIMARY_SUBJECTS).slice(0,d.schoolLevel==="Sekundarstufe"?8:6)}
+ if(onboardingStep===1)d.target=+$("#targetRange").value;
+ if(onboardingStep===2){d.subjects=$$('.subject-choice input:checked').map(x=>x.value);if(!d.subjects.length)return toast("Wähle mindestens ein Fach aus.",true)}
+ if(onboardingStep===3){d.autoAdvanceClass=$("#autoAdvanceChoice").checked;d.classRollover=$("#rolloverChoice").value}
+ if(onboardingStep<4)return showOnboarding(onboardingStep+1);
+ const p=profile();Object.assign(p,{displayName:d.displayName,schoolName:d.schoolName,schoolLevel:d.schoolLevel,classLevel:d.classLevel,avatarColor:d.accentColor});
+ data.settings.theme=d.theme;data.settings.accentColor=d.accentColor;data.settings.overallTarget=d.target;data.settings.autoAdvanceClass=d.autoAdvanceClass;data.settings.classRollover=d.classRollover;data.settings.onboardingComplete=true;data.settings.tourSeen=false;resetClassTracking();
+ d.subjects.forEach((name,i)=>{let s=data.subjects.find(x=>x.name===name);if(!s){s={id:uid(),name,category:"Schulfach",color:suggestedSubjectColor(name,i),colorSource:"suggested",archived:false};data.subjects.push(s)}if(!goalFor(s.id))data.goals.push({id:uid(),subjectId:s.id,semesterId:activeProject().id,target:d.target,active:true})});
+ const project=activeProject();project.name=`Schuljahr ${academicYearLabel(new Date(),d.classRollover)}`;project.schoolYear=academicYearLabel(new Date(),d.classRollover);save();$("#onboardingRoot").innerHTML="";onboardingDraft=null;render();startTour();
+}
+function startTour(){
+ const steps=visibleNav().map(n=>({id:n[0],title:n[2],icon:n[1],text:tourDescription(n[0])}));tourState={index:0,steps};showTourStep();
+}
+function showTourStep(){
+ if(!tourState)return;const step=tourState.steps[tourState.index];view=step.id;const group=visibleGroups().find(g=>g.views.includes(step.id));if(group)openNavGroup=group.id;render();
+ $("#tourRoot").innerHTML=`<div class="tour-layer"><section class="tour-card"><div class="tour-progress"><span style="width:${((tourState.index+1)/tourState.steps.length)*100}%"></span></div><div class="tour-count">Seite ${tourState.index+1} von ${tourState.steps.length}</div><h2>${step.icon} ${esc(step.title)}</h2><p>${esc(step.text)}</p><div class="tour-actions"><button type="button" class="btn btn-secondary btn-sm" id="tourSkip">Überspringen</button><div class="actions"><button type="button" class="btn btn-secondary btn-sm" id="tourBack" ${tourState.index===0?"disabled":""}>Zurück</button><button type="button" class="btn btn-primary btn-sm" id="tourNext">${tourState.index===tourState.steps.length-1?"Fertig":"Weiter"}</button></div></div></section></div>`;
+ $("#tourSkip").onclick=finishTour;$("#tourBack").onclick=()=>{if(tourState.index>0){tourState.index--;showTourStep()}};$("#tourNext").onclick=()=>{if(tourState.index<tourState.steps.length-1){tourState.index++;showTourStep()}else finishTour()};
+}
+function finishTour(){data.settings.tourSeen=true;save();tourState=null;$("#tourRoot").innerHTML="";view="dashboard";render();toast("Einführung abgeschlossen.")}
+
+
+function showAuth(tab="login"){
+ $("#auth").classList.remove("hidden");$("#app").classList.add("hidden");
+ $$(".tab").forEach(b=>b.classList.toggle("active",b.dataset.auth===tab));
+ $("#loginForm").classList.toggle("hidden",tab!=="login");$("#registerForm").classList.toggle("hidden",tab!=="register");
+ $("#authTitle").textContent=tab==="login"?"Willkommen zurück":"Konto erstellen";
+ $("#authSub").textContent=tab==="login"?"Melde dich bei deinem lokalen Konto an.":"Wähle deine Schulstufe. Die App passt sich automatisch an.";
+ $("#authMsg").innerHTML="";
+}
+function loginUser(account){
+ user=account;data=normalizeData(store.data[user.id]);store.data[user.id]=data;
+ sessionStorage.setItem(SESSION_KEY,user.id);localStorage.setItem(SESSION_KEY,user.id);syncClassProgression();save();$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");render();
+ if(data.settings.onboardingComplete===false)showOnboarding(0);
+ else if(data.settings.tourSeen===false)startTour();
+}
+function render(){
+ if(!user)return;
+ syncClassProgression();document.body.classList.toggle("primary-mode",isPrimary());
+ const theme=data.settings.theme||"light";document.documentElement.dataset.theme=theme;
+ const accent=data.settings.accentColor||"#f97316";document.documentElement.style.setProperty("--brand",accent);applySidebarState();
+ if(!allowedView(view))view="dashboard";
+ const nav=visibleNav(),groups=visibleGroups(),activeGroup=groups.find(g=>g.views.includes(view));
+ if(!groups.some(g=>g.id===openNavGroup))openNavGroup=activeGroup?.id||groups[0]?.id||"";
+ document.body.dataset.section=activeGroup?.id||"dashboard";
+ $("#sideNav").innerHTML=`<button class="nav-btn nav-home ${view==="dashboard"?"active":""}" data-view="dashboard" title="Übersicht"><span class="nav-icon">⌂</span><span class="nav-label">Übersicht</span></button>`+groups.map(g=>`<section class="nav-pack ${g.views.includes(view)?"active":""} ${openNavGroup===g.id?"open":""}" data-group="${g.id}"><button class="nav-pack-btn" data-nav-pack="${g.id}" aria-expanded="${openNavGroup===g.id}" title="${esc(g.label)}"><span class="nav-icon">${g.icon}</span><span class="nav-label">${esc(g.label)}</span><span class="chev">›</span></button><div class="nav-pack-items">${g.items.map(n=>`<button class="nav-sub-btn ${view===n[0]?"active":""}" data-view="${n[0]}"><span class="nav-sub-icon">${n[1]}</span><span class="nav-label">${esc(n[2])}</span></button>`).join("")}</div></section>`).join("");
+ const mobileGroups=groups.slice(0,3);$("#bottomNav").innerHTML=`<button class="${view==="dashboard"?"active":""}" data-view="dashboard"><span>⌂</span>Übersicht</button>`+mobileGroups.map(g=>`<button class="${g.views.includes(view)?"active":""}" data-pack-menu="${g.id}"><span>${g.icon}</span>${esc(g.label.split(" & ")[0])}</button>`).join("")+`<button data-action="more-menu" class="${groups.slice(3).some(g=>g.views.includes(view))?"active":""}"><span>☰</span>Mehr</button>`;
+ $$('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;const group=groups.find(g=>g.views.includes(view));if(group)openNavGroup=group.id;render();window.scrollTo({top:0,behavior:"smooth"})});
+ $$('[data-nav-pack]').forEach(b=>b.onclick=()=>{const id=b.dataset.navPack;if(document.body.classList.contains("sidebar-collapsed")){openPackMenu(id);return}openNavGroup=id;$$('.nav-pack').forEach(pack=>{const isOpen=pack.dataset.group===openNavGroup;pack.classList.toggle('open',isOpen);const button=pack.querySelector('[data-nav-pack]');if(button)button.setAttribute('aria-expanded',String(isOpen))})});$$('[data-pack-menu]').forEach(b=>b.onclick=()=>openPackMenu(b.dataset.packMenu));wireSidebarControls();
+ $("#sideAvatar").textContent=initials();$("#sideAvatar").style.background=profile().avatarColor||accent;
+ $("#sideName").textContent=profile().displayName||user.username;$("#sideClass").textContent=`${profile().schoolLevel||""} · ${profile().classLevel||""}`;$("#schoolYearBadge").textContent=`Schuljahr ${academicYearLabel()}`;
+ const item=nav.find(n=>n[0]===view);$("#topTitle").textContent=item?.[2]||"Übersicht";
+ const root=$("#content");root.innerHTML="";
+ ({dashboard:renderDashboard,subjects:renderSubjects,grades:renderGrades,report:renderReport,goals:renderGoals,projects:renderProjects,help:renderHelp,settings:renderSettings,premium:renderPremium,coach:renderCoach,calendar:renderCalendar,statistics:renderStatistics,planner:renderPlanner}[view]||renderDashboard)(root);
+ bindActions();
+}
+function renderDashboard(root){
+ const avg=overallAverage(),target=+data.settings.overallTarget||5,overallState=goalState(avg,target),overallMove=overallTrend();
+ const recent=[...projectAssessments()].sort((a,b)=>(b.examDate||b.date||"").localeCompare(a.examDate||a.date||"")).slice(0,6),subjects=currentSubjects();
+ const firstName=(profile().displayName||user.username).split(/\s+/)[0],avgPct=avg===null?0:Math.max(0,Math.min(100,((avg-1)/5)*100)),subjectPct=Math.min(100,subjects.length/12*100),gradePct=Math.min(100,projectAssessments().length/20*100),targetPct=Math.max(0,Math.min(100,((target-1)/5)*100));
+ root.innerHTML=pageHead("Start","Deine Schulübersicht","Von hier aus erreichst du alle Bereiche. Die Übersicht zeigt deinen aktuellen Stand, deine Fächer und den Notenverlauf.",`<button class="btn btn-primary" data-action="new-grade">＋ Neue Note</button>`)+
+ `<section class="card dashboard-hero"><div><div class="hero-badges"><span class="badge">${esc(profile().schoolLevel)} · ${esc(profile().classLevel)}</span><span class="badge">Schuljahr ${academicYearLabel()}</span>${data.settings.autoAdvanceClass!==false?`<span class="badge">↻ Klasse automatisch aktuell</span>`:""}</div><h1>Hallo ${esc(firstName)}.<br>Was möchtest du heute erledigen?</h1><p>Noten eintragen, kommende Aufgaben planen oder deinen aktuellen Stand und alle Fächer ansehen.</p><div class="actions"><button class="btn btn-primary" data-action="new-grade">Note eintragen</button></div></div><div class="hero-illustration">${dashboardIllustration()}</div></section>
+ <div class="section-head"><div><h2>Alle Bereiche</h2><p>Zusammengehörige Seiten sind in übersichtlichen Paketen gebündelt.</p></div></div>
+ <section class="overview-pack-grid"><button class="overview-pack" data-pack-menu="school"><div class="pack-icon">📚</div><h3>Fächer & Leistungen</h3><p>Verwalte Schulfächer, trage Bewertungen ein und sieh deine Zeugnisprognose.</p><div class="pack-features"><span class="pack-feature">Fächer</span><span class="pack-feature">Noten</span><span class="pack-feature">Zeugnis</span></div><div class="pack-art">${packIllustration("school")}</div><span class="pack-link">3 Seiten anzeigen →</span></button><button class="overview-pack" data-pack-menu="planning"><div class="pack-icon">🎯</div><h3>Ziele & Planung</h3><p>Plane Zielnoten, kommende Prüfungen, benötigte nächste Noten und Schulprojekte.</p><div class="pack-features"><span class="pack-feature">Zielnoten</span><span class="pack-feature">Prüfungen</span><span class="pack-feature">Notenplaner</span><span class="pack-feature">Projekte</span></div><div class="pack-art">${packIllustration("planning")}</div><span class="pack-link">4 Planungsseiten anzeigen →</span></button><button class="overview-pack" data-pack-menu="insights"><div class="pack-icon">📊</div><h3>Auswertung & Coach</h3><p>Erkenne Entwicklungen, vergleiche Kennzahlen und erhalte persönliche Hinweise.</p><div class="pack-features"><span class="pack-feature">Statistiken</span><span class="pack-feature">Entwicklung</span><span class="pack-feature">Coach</span></div><div class="pack-art">${packIllustration("insights")}</div><span class="pack-link">Auswertung anzeigen →</span></button><button class="overview-pack" data-pack-menu="account"><div class="pack-icon">⚙️</div><h3>Konto & App</h3><p>Ändere Profil, Darstellung, automatische Klasse und zusätzliche Funktionen.</p><div class="pack-features"><span class="pack-feature">Hilfe</span><span class="pack-feature">Einstellungen</span><span class="pack-feature">Premium</span></div><div class="pack-art">${packIllustration("account")}</div><span class="pack-link">App verwalten →</span></button></section>
+ <div class="section-head"><div><h2>Aktueller Stand</h2><p>${esc(activeProject().name||`Schuljahr ${academicYearLabel()}`)}</p></div><select class="select" id="projectSwitcher" style="width:auto;min-width:190px">${data.semesters.map(p=>`<option value="${p.id}" ${p.id===activeProject().id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
+ <section class="status-grid"><article class="status-card status-goal-${overallState}"><div class="status-card-head"><span class="status-symbol trend-symbol-${overallMove.direction==="up"?"up":overallMove.direction==="down"?"down":"flat"}">${overallMove.direction==="up"?"↑":overallMove.direction==="down"?"↓":"→"}</span><span class="status-label">Gesamtschnitt</span></div><div class="status-number">${avg===null?"–":fmt(avg,2)}</div><div class="status-copy">${avg===null?"Noch keine Noten eingetragen":overallState==="good"?`Du liegst auf oder über deinem Ziel ${fmt(target,1)}.`:`Du liegst unter deinem Ziel ${fmt(target,1)}.`}</div><div class="status-trend">${trendBadge(overallMove,true)}</div><div class="status-meter"><span style="width:${avgPct}%"></span></div><div class="status-scale"><span>1,0</span><span>Ziel ${fmt(target,1)}</span><span>6,0</span></div></article><article class="status-card status-teal"><div class="status-card-head"><span class="status-symbol">▤</span><span class="status-label">Fächer</span></div><div class="status-number">${subjects.length}</div><div class="status-copy">Aktiv eingerichtete Schulfächer mit eigenen Farben</div><div class="status-meter"><span style="width:${subjectPct}%"></span></div><div class="status-scale"><span>Start</span><span>12+</span></div></article><article class="status-card status-violet"><div class="status-card-head"><span class="status-symbol">✓</span><span class="status-label">Noten</span></div><div class="status-number">${projectAssessments().length}</div><div class="status-copy">Bewertungen im aktuellen Projekt</div><div class="status-meter"><span style="width:${gradePct}%"></span></div><div class="status-scale"><span>0</span><span>20+</span></div></article><article class="status-card status-orange"><div class="status-card-head"><span class="status-symbol">◎</span><span class="status-label">Allgemeines Ziel</span></div><div class="status-number">${fmt(target,1)}</div><div class="status-copy">Deine gewünschte Durchschnittsnote</div><div class="status-meter"><span style="width:${targetPct}%"></span></div><div class="status-scale"><span>1,0</span><span>6,0</span></div></article></section>
+ <div class="section-head dashboard-subject-section-head"><div><h2>Fächerübersicht</h2><p>Alle gewählten Fächer kompakt auf einen Blick. Tippe ein Fach an, um die einzelnen Noten zu öffnen.</p></div><button class="btn btn-secondary btn-sm" data-go="subjects">Alle Fächer</button></div>
+ ${subjects.length?`<section class="dashboard-subject-panel"><div class="dashboard-subject-grid">${subjects.map((s,index)=>{const current=averageFor(s.id),g=goalFor(s.id),count=subjectAssessments(s.id).length,color=subjectColor(s,index),state=g?goalState(current,g.target):"neutral",trend=trendForSubject(s.id),trendClass=trend.direction==="up"?"up":trend.direction==="down"?"down":"flat",trendArrow=trend.direction==="up"?"↑":trend.direction==="down"?"↓":"→";return`<button type="button" class="dashboard-subject-card ${g?`goal-${state}`:""}" style="--subject-color:${color}" data-action="dashboard-subject" data-id="${s.id}" aria-label="${esc(s.name)} öffnen"><div class="dashboard-subject-head"><div class="dashboard-subject-title"><span class="subject-dot"></span><strong>${esc(s.name)}</strong></div><span class="dashboard-subject-open">›</span></div><div class="dashboard-subject-main"><div class="dashboard-subject-score"><span>Schnitt</span><strong>${current===null?"–":fmt(current,2)}</strong><span class="dashboard-subject-trend ${trendClass}" title="Notentrend">${trendArrow}</span></div><div class="subject-sparkline">${subjectLineChart(s.id,true)}</div></div><div class="dashboard-subject-meta"><span>Ziel <strong>${g?fmt(g.target,1):"–"}</strong></span><span><strong>${count}</strong> ${count===1?"Note":"Noten"}</span></div></button>`}).join("")}</div></section>`:empty("▤","Noch keine Fächer","Wähle zuerst deine Schulfächer aus.",`<button class="btn btn-primary" data-action="new-subject">Fach hinzufügen</button>`)}
+ <div class="section-head"><div><h2>Zuletzt passiert</h2><p>Deine neuesten Bewertungen</p></div></div><section class="card"><h3>Letzte Noten</h3>${recent.length?`<div class="mini-timeline">${recent.map((a,i)=>{const s=subject(a.subjectId),color=subjectColor(s,i);return`<div class="timeline-row"><span class="timeline-icon" style="--subject-color:${color}">${s?.name?.slice(0,1)||"N"}</span><div><strong>${esc(a.title||"Bewertung")}</strong><div class="muted">${esc(s?.name||"Fach")} · ${dateFmt(a.examDate||a.date)}</div></div><span class="grade-pill ${gradeTone(a.grade)}">${fmt(a.grade,1)}</span></div>`}).join("")}</div>`:`<p class="muted">Noch keine Noten eingetragen.</p>`}</section>`;
+ $("#projectSwitcher").onchange=e=>setActiveProject(e.target.value);$$('[data-pack-menu]').forEach(b=>b.onclick=()=>openPackMenu(b.dataset.packMenu));
+}
+function renderSubjects(root){
+ root.innerHTML=pageHead("Schulfächer","Fächer","Jedes Fach kann eine eigene Farbe erhalten. Die Umrandung zeigt zusätzlich, ob du dein Ziel momentan erreichst.",`<button class="btn btn-primary" data-action="new-subject">＋ Fach hinzufügen</button>`)+
+ (currentSubjects().length?`<section class="grid grid-2">${currentSubjects().map((s,i)=>{const avg=averageFor(s.id),count=subjectAssessments(s.id).length,g=goalFor(s.id),color=subjectColor(s,i),state=g?goalState(avg,g.target):"neutral",trend=trendForSubject(s.id);return`<article class="card subject-card subject-card-color ${g?`goal-${state}`:""}" style="--subject-color:${color}"><div class="subject-strip" style="background:${color}"></div><div class="subject-top"><div><div class="subject-name-row"><span class="subject-dot"></span><div class="subject-name">${esc(s.name)}</div></div><div class="muted">${esc(s.category||"Schulfach")}</div><div class="subject-color-caption" style="margin-top:9px"><span class="subject-dot" style="width:8px;height:8px;box-shadow:none"></span>Individuelle Fachfarbe</div></div><div class="subject-grade-wrap"><div class="grade-large">${avg===null?"–":fmt(avg,2)}</div>${trendBadge(trend)}</div></div><div class="mini-grid"><div class="mini"><span>Noten</span><strong>${count}</strong></div><div class="mini"><span>Ziel</span><strong>${g?fmt(g.target,1):"–"}</strong></div></div>${g&&avg!==null?`<div class="message ${state==="good"?"good":"bad"}" style="margin-top:12px">${state==="good"?`✓ Du liegst ${avg>g.target?"über":"auf"} deinem Ziel.`:`↓ Du liegst ${fmt(g.target-avg,2)} unter deinem Ziel.`}</div>`:""}<div class="actions" style="margin-top:15px"><button class="btn btn-secondary btn-sm" data-action="grade-for" data-id="${s.id}">Note eintragen</button><button class="btn btn-secondary btn-sm" data-action="edit-subject" data-id="${s.id}">Farbe & Fach ändern</button></div></article>`}).join("")}</section>`:empty("▤","Noch keine Fächer","Füge zuerst deine Schulfächer hinzu.",`<button class="btn btn-primary" data-action="new-subject">Fach hinzufügen</button>`));
+}
+function renderGrades(root){
+ const arr=[...projectAssessments()].sort((a,b)=>(b.examDate||b.date||"").localeCompare(a.examDate||a.date||""));
+ root.innerHTML=pageHead("Ergebnisse","Noten","Die Fachfarbe macht sofort sichtbar, zu welchem Fach eine Bewertung gehört.",`<button class="btn btn-primary" data-action="new-grade">＋ Neue Note</button>`)+
+ (arr.length?`<div class="table-wrap"><table><thead><tr><th>Fach</th><th>Aufgabe oder Prüfung</th><th>Datum</th><th>Gewichtung</th><th>Note</th><th></th></tr></thead><tbody>${arr.map((a,i)=>{const s=subject(a.subjectId),color=subjectColor(s,i);return`<tr><td><span class="grade-subject" style="--subject-color:${color}"><span class="subject-dot"></span>${esc(s?.name||"–")}</span></td><td><strong>${esc(a.title||"Bewertung")}</strong><div class="muted">${esc(a.type||"")}</div></td><td>${dateFmt(a.examDate||a.date)}</td><td>${fmt(a.weight||1,1)}×</td><td><span class="grade-pill ${gradeTone(a.grade)}">${fmt(a.grade,1)}</span></td><td><button class="btn btn-secondary btn-sm" data-action="edit-grade" data-id="${a.id}">Ändern</button> <button class="btn btn-danger btn-sm" data-action="delete-grade" data-id="${a.id}">Löschen</button></td></tr>`}).join("")}</tbody></table></div>`:empty("＋","Noch keine Noten","Trage deine erste Note ein.",`<button class="btn btn-primary" data-action="new-grade">Note eintragen</button>`));
+}
+function renderReport(root){
+ const rows=currentSubjects().map(s=>({s,avg:averageFor(s.id),manual:data.reportGrades.find(r=>r.subjectId===s.id&&(!r.semesterId||r.semesterId===activeProject().id))}));
+ root.innerHTML=pageHead("Schuljahr","Zeugnis","Hier siehst du deine Zeugnisnoten.",`<button class="btn btn-secondary" onclick="window.print()">Drucken</button>`)+
+ `<section class="report-sheet"><div class="report-title"><h2>Zeugnisübersicht</h2><div class="muted">${esc(profile().displayName||user.username)} · ${esc(profile().schoolLevel||"")} · ${esc(profile().classLevel||"")}</div><div class="muted">${esc(activeProject().name||"")}</div></div>
+ ${rows.length?`<div class="table-wrap" style="border:0"><table><thead><tr><th>Fach</th><th>Berechneter Schnitt</th><th>Zeugnisnote</th></tr></thead><tbody>${rows.map(r=>`<tr><td><strong>${esc(r.s.name)}</strong></td><td>${r.avg===null?"–":fmt(r.avg,2)}</td><td><button class="grade-pill ${gradeTone(r.manual?.grade??r.avg)}" data-action="report-grade" data-id="${r.s.id}" style="border:0">${r.manual?.grade!==undefined?fmt(r.manual.grade,1):(r.avg===null?"–":fmt(Math.round(r.avg*2)/2,1))}</button></td></tr>`).join("")}</tbody></table></div>`:`<p class="muted">Füge zuerst Fächer hinzu.</p>`}
+ <p class="muted" style="margin-top:18px">Diese Übersicht ist eine persönliche Prognose und kein offizielles Zeugnis.</p></section>`;
+}
+function renderGoals(root){
+ const subjects=currentSubjects(),activeGoals=subjects.map((s,index)=>({s,index,g:goalFor(s.id),avg:averageFor(s.id),trend:trendForSubject(s.id)})).filter(x=>x.g),reached=activeGoals.filter(x=>x.avg!==null&&x.avg>=x.g.target).length;
+ const avg=overallAverage(),target=+data.settings.overallTarget||5,overallState=goalState(avg,target),overallMove=overallTrend();
+ root.innerHTML=pageHead("Deine Wünsche","Ziele","Grün bedeutet: Ziel erreicht oder übertroffen. Rot bedeutet: momentan noch unter dem Ziel. Der Pfeil zeigt die Veränderung durch die letzte Note.",`<button class="btn btn-primary" data-action="new-goal">＋ Ziel hinzufügen</button>`)+planningNav("goals")+
+ `<section class="goal-overview-grid"><article class="goal-overview-card"><div class="goal-overview-top"><span class="goal-overview-icon">◎</span>Aktive Ziele</div><strong>${activeGoals.length}</strong></article><article class="goal-overview-card"><div class="goal-overview-top"><span class="goal-overview-icon">✓</span>Bereits erreicht</div><strong>${reached}</strong></article><article class="goal-overview-card overall-${overallState}"><div class="goal-overview-top"><span class="goal-overview-icon trend-icon-${overallMove.direction==="up"?"up":overallMove.direction==="down"?"down":"flat"}">${overallMove.direction==="up"?"↑":overallMove.direction==="down"?"↓":"→"}</span>Gesamtschnitt</div><strong>${avg===null?"–":fmt(avg,2)}</strong><div class="goal-overview-trend">${trendBadge(overallMove)}</div></article><article class="goal-overview-card"><div class="goal-overview-top"><span class="goal-overview-icon">★</span>Allgemeines Ziel</div><strong>${fmt(target,1)}</strong></article></section>`+
+ (subjects.length?`<section class="grid grid-2">${subjects.map((s,index)=>{const g=goalFor(s.id),current=averageFor(s.id),trend=trendForSubject(s.id),arr=subjectAssessments(s.id),sum=arr.reduce((t,a)=>t+(+a.grade||0)*(+a.weight||1),0),w=arr.reduce((t,a)=>t+(+a.weight||1),0),needed=g&&arr.length?g.target*(w+1)-sum:null,currentPct=current===null?0:Math.max(0,Math.min(100,((current-1)/5)*100)),targetPct=g?Math.max(0,Math.min(100,((g.target-1)/5)*100)):0,gap=g&&current!==null?g.target-current:null,state=g?goalState(current,g.target):"neutral",status=!g?"Noch offen":current===null?"Startbereit":state==="good"?"Ziel erreicht":"Unter dem Ziel",statusClass=!g?"open":state==="good"?"reached":current===null?"open":"behind";
+ let advice="Lege zuerst eine Zielnote fest. Danach zeigt dir NotenPilot den nächsten sinnvollen Schritt.";
+ if(g&&current===null)advice="Trage deine erste Bewertung ein. Danach kann dein Fortschritt zuverlässig berechnet werden.";
+ else if(g&&state==="good")advice="Dein aktueller Schnitt liegt bereits auf oder über deinem Ziel. Halte dieses Niveau mit regelmässiger Vorbereitung.";
+ else if(g&&needed!==null&&needed>6)advice="Mit nur einer nächsten Note ist dieses Ziel noch nicht erreichbar. Plane mehrere gute Ergebnisse und nutze den Notenplaner.";
+ else if(g&&needed!==null&&needed<1)advice="Dein Ziel ist bereits gut abgesichert. Konzentriere dich darauf, dein Niveau zu halten.";
+ else if(g&&needed!==null)advice=`Bei einer einfach gewichteten nächsten Bewertung brauchst du ungefähr eine ${fmt(needed,1)}, um direkt auf dein Ziel zu kommen.`;
+ const color=subjectColor(s,index);return`<article class="card goal-card-new goal-state-${state}" style="--subject-color:${color}"><header class="goal-card-head"><div class="goal-subject-line"><span class="goal-subject-dot"></span><h3>${esc(s.name)}</h3></div><span class="goal-status ${statusClass}">${status}</span></header><div class="goal-score-row"><div class="goal-score-box ${state==="good"?"current-good":state==="bad"?"current-bad":""}"><span>Aktueller Schnitt</span><strong>${current===null?"–":fmt(current,2)}</strong><div class="goal-trend-row"><span class="goal-trend-label">Durch letzte Note</span>${trendBadge(trend)}</div></div><div class="goal-score-arrow">→</div><div class="goal-score-box target"><span>Deine Zielnote</span><strong>${g?fmt(g.target,1):"–"}</strong></div></div><div class="grade-scale"><div class="grade-scale-fill" style="width:${currentPct}%"></div>${g?`<span class="grade-target-marker" style="left:${targetPct}%" title="Ziel ${fmt(g.target,1)}"></span>`:""}</div><div class="grade-scale-labels"><span>1,0</span><span>${g?`Ziel ${fmt(g.target,1)}`:"Noch kein Ziel"}</span><span>6,0</span></div><div class="goal-advice"><span class="goal-advice-icon">💡</span><div><strong>Nächster sinnvoller Schritt</strong><p>${advice}</p></div></div><div class="goal-meta-row"><span class="goal-meta">${arr.length} ${arr.length===1?"Note":"Noten"}</span>${g&&current!==null?`<span class="goal-meta">${state==="good"?"Über Ziel":"Fehlen"} ${fmt(Math.abs(gap),2)}</span>`:""}${needed!==null&&needed>=1&&needed<=6?`<span class="goal-meta">Nächste Note ca. ${fmt(needed,1)}</span>`:""}</div><footer class="goal-actions"><button class="btn btn-secondary btn-sm" data-action="goal-for" data-id="${s.id}">${g?"Ziel ändern":"Ziel setzen"}</button><button class="btn btn-secondary btn-sm" data-action="grade-for" data-id="${s.id}">Note eintragen</button><button class="btn btn-secondary btn-sm" data-action="edit-subject" data-id="${s.id}">Farbe ändern</button>${g?`<button class="btn btn-danger btn-sm" data-action="delete-goal" data-id="${g.id}">Entfernen</button>`:""}</footer></article>`}).join("")}</section>`:empty("◎","Noch keine Fächer","Füge zuerst ein Fach hinzu."));
+}
+function renderProjects(root){
+ root.innerHTML=pageHead("Organisation","Projekte","Trenne Schuljahre, Semester oder besondere Lernphasen sauber voneinander.",`<button class="btn btn-primary" data-action="new-project">＋ Projekt erstellen</button>`)+planningNav("projects")+
+ `<section class="notice"><h3>${premiumActive()?"Premium aktiv":"Kostenloser Plan"}</h3><p>${premiumActive()?"Du kannst beliebig viele Projekte erstellen.":`Du kannst bis zu ${FREE_PROJECT_LIMIT} Projekte erstellen.`}</p></section><div class="section-head"><div><h2>Deine Projekte</h2><p>Noten und Ziele werden pro Projekt getrennt.</p></div></div>
+ <section class="grid grid-2">${data.semesters.map((p,i)=>`<article class="card"><div style="height:8px;border-radius:8px;background:${p.color||COLORS[i%COLORS.length]};margin:-20px -20px 18px"></div><span class="badge ${p.id===activeProject().id?"brand":""}">${p.id===activeProject().id?"Aktiv":esc(p.kind||"Projekt")}</span><h2 style="margin:12px 0 4px">${esc(p.name||"Projekt")}</h2><p class="muted">${esc(p.schoolYear||"")} ${p.description?`· ${esc(p.description)}`:""}</p><div class="actions"><button class="btn btn-primary btn-sm" data-action="activate-project" data-id="${p.id}">${p.id===activeProject().id?"Aktiv":"Öffnen"}</button><button class="btn btn-secondary btn-sm" data-action="edit-project" data-id="${p.id}">Bearbeiten</button>${data.semesters.length>1?`<button class="btn btn-danger btn-sm" data-action="delete-project" data-id="${p.id}">Löschen</button>`:""}</div></article>`).join("")}</section>`;
+}
+function renderHelp(root){
+ const coachHelp=isLowerPrimary()?"":`<article class="card"><h2>KI-Coach</h2><p class="muted">${isUpperPrimary()?"Ab der 5. Primarklasse kann der KI-Coach mit Premium verwendet werden.":"Der KI-Coach ist eine Premium-Funktion."}</p></article>`;
+ root.innerHTML=pageHead("Information","Hilfe","Hier findest du einfache Erklärungen zur App.")+
+ `<section class="grid grid-2"><article class="card"><h2>So startest du</h2><ol class="muted" style="padding-left:20px"><li>Füge unter „Fächer“ deine Schulfächer hinzu.</li><li>Drücke auf „Neue Note eintragen“.</li><li>Lege unter „Ziele“ deine Wunsch-Noten fest.</li><li>Erstelle unter „Projekte“ ein neues Schulhalbjahr.</li></ol></article>
+ <article class="card"><h2>Wo sind meine Daten?</h2><p class="muted">Deine Daten werden lokal im Browser gespeichert. Verwende in den Einstellungen regelmässig die Datensicherung.</p></article>
+ <article class="card"><h2>Primarschulmodus</h2><p class="muted">In der 1. bis 6. Primarklasse wird die App automatisch vereinfacht. Prüfungskalender, Statistiken und Notenplaner werden ausgeblendet.</p></article>
+ ${coachHelp}</section>`;
+}
+function renderSettings(root){
+ const p=profile(),roll=data.settings.classRollover||"07-15";
+ root.innerHTML=pageHead("Anpassen","Einstellungen","Hier kannst du Profil, automatische Klassenstufe und Darstellung anpassen.")+
+ `<form id="settingsForm" class="grid grid-2"><section class="card"><h2>Profil & Schule</h2><div class="form"><div class="field full"><label>Anzeigename</label><input class="input" name="displayName" value="${esc(p.displayName||user.username)}"></div><div class="field full"><label>Schulhaus</label><input class="input" name="schoolName" value="${esc(p.schoolName||"")}"></div><div class="field"><label>Schulstufe</label><select class="select" name="schoolLevel" id="setLevel"><option ${isPrimary()?"selected":""}>Primarschule</option><option ${!isPrimary()?"selected":""}>Sekundarstufe</option></select></div><div class="field"><label>Klasse</label><select class="select" name="classLevel" id="setClass">${classOptions(isPrimary()?"Primarschule":"Sekundarstufe",p.classLevel)}</select></div></div><div class="notice" style="margin-top:18px"><h3>Aktuelles Schuljahr: ${academicYearLabel()}</h3><p>NotenPilot zeigt derzeit ${esc(p.schoolLevel)} · ${esc(p.classLevel)} an.</p></div></section>
+ <section class="card"><h2>Darstellung</h2><div class="notice" style="margin-bottom:16px"><h3>Verstellbare Seitenleiste</h3><p>Ziehe am schmalen Griff am rechten Rand der Seitenleiste, um sie breiter oder schmaler zu machen. Mit dem Pfeil neben dem Logo kannst du sie ganz einklappen.</p></div><div class="field"><label>Farbschema</label><select class="select" name="theme"><option value="light" ${data.settings.theme!=="dark"?"selected":""}>Hell</option><option value="dark" ${data.settings.theme==="dark"?"selected":""}>Dunkel</option></select></div><div class="field" style="margin-top:14px"><label>Akzentfarbe</label><input type="color" name="accentColor" value="${esc(data.settings.accentColor||"#f97316")}" style="width:100%;height:52px;border:1px solid var(--line);border-radius:13px;background:var(--card)"></div><div class="notice" style="margin-top:18px"><h3>Automatische Oberfläche</h3><p>${isPrimary()?"Der vereinfachte Primarschulmodus ist aktiv.":"Die erweiterte Sekundarschul-Version ist aktiv."}</p></div></section>
+ <section class="card"><h2>Automatischer Klassenwechsel</h2><label class="switch"><input type="checkbox" name="autoAdvanceClass" ${data.settings.autoAdvanceClass!==false?"checked":""}> Klasse jedes Schuljahr automatisch aktualisieren</label><div class="field" style="margin-top:16px"><label>Zeitpunkt während der Sommerferien</label><select class="select" name="classRollover"><option value="07-01" ${roll==="07-01"?"selected":""}>1. Juli</option><option value="07-15" ${roll==="07-15"?"selected":""}>15. Juli</option><option value="08-01" ${roll==="08-01"?"selected":""}>1. August</option><option value="08-15" ${roll==="08-15"?"selected":""}>15. August</option></select></div><p class="muted">Beispiel: Aus der 2. Sek wird nach diesem Datum automatisch die 3. Sek. Nach der 6. Primarklasse wechselt die App in die 1. Sek.</p></section>
+ <section class="card"><h2>Einführung</h2><p class="muted">Starte die geführte Seitentour erneut. Dabei wird jede verfügbare Seite angezeigt und unten rechts erklärt.</p><button type="button" class="btn btn-secondary" data-action="restart-tour">Einführung erneut starten</button></section><div class="field full"><button class="btn btn-primary btn-block">Alle Änderungen speichern</button></div></form>
+ <div class="section-head"><div><h2>Daten</h2><p>Sichern oder wiederherstellen</p></div></div><section class="card"><div class="settings-row"><div><h3>Datensicherung herunterladen</h3><p>Speichert Konten, Noten, Ziele und Projekte als JSON-Datei.</p></div><button class="btn btn-secondary" data-action="export">Exportieren</button></div><div class="settings-row"><div><h3>Datensicherung importieren</h3><p>Ersetzt die aktuellen App-Daten nach Bestätigung.</p></div><label class="btn btn-secondary">Importieren<input id="importFile" type="file" accept=".json,application/json" hidden></label></div><div class="settings-row"><div><h3>Abmelden</h3><p>Deine lokalen Daten bleiben gespeichert.</p></div><button class="btn btn-secondary" data-action="logout">Abmelden</button></div></section>`;
+ $("#setLevel").onchange=e=>{$("#setClass").innerHTML=classOptions(e.target.value,"")};
+ $("#settingsForm").onsubmit=e=>{e.preventDefault();const fd=new FormData(e.currentTarget),oldIndex=classIndex(p.schoolLevel,p.classLevel),oldRollover=data.settings.classRollover;
+ Object.assign(p,{displayName:String(fd.get("displayName")).trim(),schoolName:String(fd.get("schoolName")).trim(),schoolLevel:fd.get("schoolLevel"),classLevel:fd.get("classLevel")});data.settings.theme=fd.get("theme");data.settings.accentColor=fd.get("accentColor");data.settings.autoAdvanceClass=fd.get("autoAdvanceClass")==="on";data.settings.classRollover=fd.get("classRollover");
+ if(oldIndex!==classIndex(p.schoolLevel,p.classLevel)||oldRollover!==data.settings.classRollover)resetClassTracking();save();if(!allowedView(view))view="dashboard";toast("Einstellungen gespeichert.");render()};
+}
+
+function renderPremium(root){
+ const lower=isLowerPrimary();
+ const intro=lower?"Premium erweitert die Anzahl deiner Projekte und weitere erlaubte Funktionen.":"Premium erweitert Projekte und schaltet zusätzliche Funktionen frei.";
+ const features=lower
+  ?`<div class="feature">✓ Unbegrenzt viele Projekte</div><div class="feature">✓ Mehr Möglichkeiten für deine Schulorganisation</div><div class="feature">✓ Premium bleibt lokal gespeichert</div>`
+  :`<div class="feature">✓ Unbegrenzt viele Projekte</div><div class="feature">✓ KI-Coach ab der 5. Klasse</div><div class="feature">✓ Erweiterte Funktionen in der Sekundarschule</div><div class="feature">✓ Premium bleibt lokal gespeichert</div>`;
+ root.innerHTML=pageHead("Zusatzfunktionen","Premium","Hier kannst du Premium-Funktionen freischalten.")+
+ `<section class="card premium"><span class="badge" style="background:rgba(255,255,255,.12);color:#fff">${premiumActive()?"Premium aktiv":"Premium-Code"}</span><h1 style="font-size:38px;margin:14px 0 7px">${premiumActive()?"Premium ist freigeschaltet":"Mehr Möglichkeiten"}</h1><p>${intro}</p><div class="feature-grid">${features}</div></section>
+ ${premiumActive()?`<section class="card" style="margin-top:18px"><h2>Premium ist aktiv</h2><p class="muted">Dein Konto hat Zugriff auf die erlaubten Premium-Funktionen.</p></section>`:`<section class="card" style="margin-top:18px"><h2>Code eingeben</h2><form id="premiumForm" class="form"><div class="field full"><label>Premium-Code</label><input class="input" name="code" required placeholder="Code eingeben"></div><div class="field full"><button class="btn btn-primary">Premium freischalten</button></div></form></section>`}`;
+ if($("#premiumForm"))$("#premiumForm").onsubmit=e=>{e.preventDefault();const code=String(new FormData(e.currentTarget).get("code")).replace(/[^a-z0-9]/gi,"").toUpperCase();if(code!==PREMIUM_CODE)return toast("Der Premium-Code ist nicht gültig.",true);data.premium={...(data.premium||{}),active:true,activatedAt:new Date().toISOString()};save();toast("Premium wurde freigeschaltet.");render()};
+}
+function renderCoach(root){
+ if(!coachVisible()){view="dashboard";return render()}
+ const history=data.coachHistory||[];
+ root.innerHTML=pageHead("Premium","KI-Coach",isUpperPrimary()?"Der Lerncoach erklärt dir deine Noten in einfacher Sprache.":"Der Coach gibt dir Hinweise zu Noten und Zielen.")+
+ `<section class="grid grid-2"><article class="card"><h2>Was möchtest du wissen?</h2><form id="coachForm"><div class="field"><label>Deine Frage</label><textarea class="textarea" name="question" placeholder="Zum Beispiel: Wie kann ich mein Mathe-Ziel erreichen?" required></textarea></div><button class="btn btn-primary" style="margin-top:12px">Antwort erstellen</button></form></article><article class="card"><h2>Schnelle Auswertung</h2><p class="muted">${coachSummary()}</p></article></section>
+ <div class="section-head"><div><h2>Letzte Antworten</h2></div></div>${history.length?`<section class="list">${history.slice(-6).reverse().map(h=>`<article class="card"><strong>${esc(h.question)}</strong><p class="muted">${esc(h.answer)}</p></article>`).join("")}</section>`:empty("✦","Noch keine Fragen","Stelle dem Coach deine erste Frage.")}`;
+ $("#coachForm").onsubmit=e=>{e.preventDefault();const q=String(new FormData(e.currentTarget).get("question")).trim(),answer=coachAnswer(q);data.coachHistory.push({id:uid(),question:q,answer,createdAt:new Date().toISOString()});save();render()};
+}
+function coachSummary(){
+ const avg=overallAverage();if(avg===null)return"Trage zuerst einige Noten ein. Danach kann der Coach deine Entwicklung erklären.";
+ const weak=currentSubjects().map(s=>({s,a:averageFor(s.id)})).filter(x=>x.a!==null).sort((a,b)=>a.a-b.a)[0];
+ return`Dein Gesamtschnitt liegt bei ${fmt(avg,2)}.${weak?` Im Fach ${weak.s.name} liegt dein Schnitt bei ${fmt(weak.a,2)}. Plane dort kleine, regelmässige Übungsschritte.`:""}`;
+}
+function coachAnswer(q){
+ const avg=overallAverage(),goals=data.goals.filter(g=>g.active!==false&&(!g.semesterId||g.semesterId===activeProject().id));
+ if(avg===null)return"Trage zuerst mindestens eine Note ein. Danach kann ich dir Hinweise geben, die zu deinen Ergebnissen passen.";
+ const low=currentSubjects().map(s=>({s,a:averageFor(s.id),g:goalFor(s.id)})).filter(x=>x.a!==null).sort((a,b)=>a.a-b.a)[0];
+ return`${isPrimary()?"Ich erkläre es einfach: ":""}Dein Gesamtschnitt ist ${fmt(avg,2)}. ${low?`Beginne mit ${low.s.name}. Dort ist dein Schnitt ${fmt(low.a,2)}. Übe lieber jeden Tag 10 bis 15 Minuten statt alles auf einmal. `:""}${goals.length?`Du hast ${goals.length} aktives Ziel. Prüfe nach jeder neuen Note, ob du deinem Ziel näher kommst.`:"Lege zusätzlich eine Zielnote fest, damit du deinen Fortschritt sehen kannst."}`;
+}
+function renderCalendar(root){
+ const upcoming=(data.plannedExams||[]).filter(x=>!x.semesterId||x.semesterId===activeProject().id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+ root.innerHTML=pageHead("Planung","Prüfungskalender","Plane Prüfungen und Abgaben, damit nichts überraschend kommt.",`<button class="btn btn-primary" id="newExamBtn">＋ Termin planen</button>`)+planningNav("calendar")+
+ (upcoming.length?`<section class="list">${upcoming.map(x=>{const d=x.date?new Date(x.date+"T12:00:00"):null,day=d?d.getDate():"–",month=d?d.toLocaleDateString("de-CH",{month:"short"}):"";return`<article class="list-item exam-card"><div style="display:flex;gap:13px;align-items:center;min-width:0"><div class="exam-date"><div>${day}<small>${esc(month)}</small></div></div><div class="list-main"><strong>${esc(x.title||"Prüfung")}</strong><span>${esc(subject(x.subjectId)?.name||x.subjectName||"Allgemein")} · ${dateFmt(x.date)}${x.note?` · ${esc(x.note)}`:""}</span></div></div><div class="list-actions"><button class="btn btn-danger btn-sm" data-delete-exam="${x.id}">Löschen</button></div></article>`}).join("")}</section>`:empty("▣","Noch nichts geplant","Trage deine nächste Prüfung oder Abgabe ein. So bleibt dein Plan aktuell.",`<button class="btn btn-primary" id="emptyExamBtn">Ersten Termin planen</button>`));
+ const openExam=()=>modal("Termin planen",`<form id="examForm" class="form"><div class="field full"><label>Titel</label><input class="input" name="title" placeholder="z. B. Matheprüfung Brüche" required></div><div class="field"><label>Fach</label><select class="select" name="subjectId"><option value="">Allgemein</option>${currentSubjects().map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")}</select></div><div class="field"><label>Datum</label><input class="input" type="date" name="date" value="${today()}" required></div><div class="field full"><label>Notiz</label><input class="input" name="note" placeholder="z. B. Kapitel 4 bis 6"></div></form>`,`<button class="btn btn-secondary" data-close-modal>Abbrechen</button><button class="btn btn-primary" id="saveExam">Speichern</button>`),wireExam=()=>{$$("[data-close-modal]").forEach(x=>x.onclick=closeModal);$("#saveExam").onclick=()=>{const form=$("#examForm");if(!form.reportValidity())return;const fd=new FormData(form);data.plannedExams.push({id:uid(),semesterId:activeProject().id,title:String(fd.get("title")).trim(),subjectId:fd.get("subjectId"),date:fd.get("date"),note:String(fd.get("note")||"").trim()});save();closeModal();toast("Termin gespeichert.");render()}};
+ const launch=()=>{openExam();wireExam()};if($("#newExamBtn"))$("#newExamBtn").onclick=launch;if($("#emptyExamBtn"))$("#emptyExamBtn").onclick=launch;
+ $$('[data-delete-exam]').forEach(b=>b.onclick=()=>{if(confirm("Diesen geplanten Termin löschen?")){data.plannedExams=data.plannedExams.filter(x=>x.id!==b.dataset.deleteExam);save();render()}});
+}
+
+function statsMedian(values){
+ const nums=values.map(Number).filter(Number.isFinite).sort((a,b)=>a-b);if(!nums.length)return null;const m=Math.floor(nums.length/2);return nums.length%2?nums[m]:(nums[m-1]+nums[m])/2;
+}
+function statsMode(values){
+ const nums=values.map(v=>Math.round((+v||0)*10)/10).filter(Number.isFinite);if(!nums.length)return null;const counts=new Map();nums.forEach(v=>counts.set(v,(counts.get(v)||0)+1));let best=null,max=0;for(const [v,c] of counts){if(c>max){best=v;max=c}}return max>1?best:null;
+}
+function statsDeviation(values){
+ const nums=values.map(Number).filter(Number.isFinite);if(nums.length<2)return 0;const mean=nums.reduce((a,b)=>a+b,0)/nums.length;return Math.sqrt(nums.reduce((sum,n)=>sum+(n-mean)**2,0)/nums.length);
+}
+function statsPeriodFilter(arr,period){
+ if(period==='all')return arr;const days=+period||0,cutoff=Date.now()-days*86400000;return arr.filter(a=>{const raw=a.examDate||a.date||a.createdAt||'';const stamp=Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T12:00:00':raw);return Number.isFinite(stamp)&&stamp>=cutoff});
+}
+function statsTrendForArray(arr){
+ const sorted=sortedAssessments(arr);if(sorted.length<2)return{direction:'new',delta:null};const split=Math.max(1,Math.floor(sorted.length/2)),first=weightedAverage(sorted.slice(0,split)),second=weightedAverage(sorted.slice(split));return trendFromAverages(second,first,sorted[sorted.length-1]);
+}
+function statsTimeChart(arr){
+ const sorted=sortedAssessments(arr);if(!sorted.length)return`<div class="stats-empty"><div><strong>Noch keine Noten</strong><br><span>Nach der ersten Note erscheint hier dein Zeitverlauf.</span></div></div>`;
+ const width=920,height=300,padL=45,padR=18,padT=22,padB=40,innerW=width-padL-padR,innerH=height-padT-padB;
+ const x=i=>sorted.length===1?padL+innerW/2:padL+i*(innerW/(sorted.length-1)),y=g=>padT+(6-Math.max(1,Math.min(6,+g||1)))/5*innerH;
+ const guides=[1,2,3,4,5,6].map(n=>`<line x1="${padL}" y1="${y(n)}" x2="${width-padR}" y2="${y(n)}" stroke="currentColor" opacity="${n===4?'.22':'.08'}"/><text x="${padL-11}" y="${y(n)+4}" text-anchor="end" font-size="11" fill="currentColor" opacity=".62">${n}</text>`).join('');
+ const run=[],prefix=[];sorted.forEach((a,i)=>{prefix.push(a);run.push(weightedAverage(prefix))});
+ const avgPoints=run.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' '),target=+data.settings.overallTarget||5;
+ const targetLine=`<line x1="${padL}" y1="${y(target)}" x2="${width-padR}" y2="${y(target)}" stroke="#f97316" stroke-width="2" stroke-dasharray="7 6"/><text x="${width-padR}" y="${y(target)-7}" text-anchor="end" font-size="11" font-weight="850" fill="#f97316">Ziel ${fmt(target,1)}</text>`;
+ const points=sorted.map((a,i)=>{const s=subject(a.subjectId),idx=Math.max(0,currentSubjects().findIndex(v=>v.id===a.subjectId)),c=subjectColor(s,idx);return`<circle cx="${x(i)}" cy="${y(a.grade)}" r="5" fill="${c}" stroke="var(--card)" stroke-width="2"><title>${esc(s?.name||'Fach')}: ${fmt(a.grade,1)} – ${dateFmt(a.examDate||a.date)}</title></circle>`}).join('');
+ const labelIndexes=[0,Math.floor((sorted.length-1)/2),sorted.length-1].filter((v,i,a)=>a.indexOf(v)===i),labels=labelIndexes.map(i=>`<text x="${x(i)}" y="${height-12}" text-anchor="${i===0?'start':i===sorted.length-1?'end':'middle'}" font-size="10" fill="currentColor" opacity=".65">${dateFmt(sorted[i].examDate||sorted[i].date)}</text>`).join('');
+ return`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Notenverlauf über die Zeit"><g style="color:var(--muted)">${guides}${labels}</g>${targetLine}<polyline points="${avgPoints}" fill="none" stroke="var(--section-accent)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>${points}<text x="${padL+8}" y="${padT+14}" font-size="11" font-weight="850" fill="var(--section-accent)">Laufender Schnitt</text></svg>`;
+}
+function statsDistribution(arr){
+ const bins=[{l:'1,0–1,9',min:1,max:1.99},{l:'2,0–2,9',min:2,max:2.99},{l:'3,0–3,9',min:3,max:3.99},{l:'4,0–4,9',min:4,max:4.99},{l:'5,0–5,4',min:5,max:5.49},{l:'5,5–6,0',min:5.5,max:6.01}],counts=bins.map(b=>arr.filter(a=>+a.grade>=b.min&&+a.grade<=b.max).length),max=Math.max(1,...counts);
+ return`<div class="stats-distribution">${bins.map((b,i)=>`<div class="stats-bin"><strong>${counts[i]}</strong><div class="stats-bar-track"><div class="stats-bar-fill" style="height:${counts[i]/max*100}%"></div></div><span>${b.l}</span></div>`).join('')}</div>`;
+}
+function statsSubjectRows(arr,sortKey='average'){
+ let rows=currentSubjects().map((s,index)=>{const a=arr.filter(x=>x.subjectId===s.id),grades=a.map(x=>+x.grade),avg=weightedAverage(a),trend=statsTrendForArray(a),g=goalFor(s.id);return{s,index,a,grades,avg,trend,g,best:grades.length?Math.max(...grades):null,worst:grades.length?Math.min(...grades):null,pass:grades.length?grades.filter(v=>v>=(+data.settings.passingGrade||4)).length/grades.length*100:0}}).filter(r=>r.a.length);
+ const directions={up:2,flat:1,new:0,down:-1};rows.sort((a,b)=>{if(sortKey==='count')return b.a.length-a.a.length;if(sortKey==='best')return (b.best??0)-(a.best??0);if(sortKey==='worst')return (a.worst??9)-(b.worst??9);if(sortKey==='trend')return (directions[b.trend.direction]||0)-(directions[a.trend.direction]||0)||((b.trend.delta||0)-(a.trend.delta||0));return(b.avg??0)-(a.avg??0)});return rows;
+}
+function statsInsightCards(arr,rows){
+ if(!arr.length)return`<div class="stats-insight"><span class="stats-insight-icon">＋</span><strong>Erste Note eintragen</strong><p>Danach erkennt NotenPilot automatisch Stärken, Risiken und Entwicklungen.</p></div>`;
+ const best=[...arr].sort((a,b)=>+b.grade-+a.grade)[0],worst=[...arr].sort((a,b)=>+a.grade-+b.grade)[0],up=rows.filter(r=>r.trend.direction==='up').sort((a,b)=>(b.trend.delta||0)-(a.trend.delta||0))[0],risk=rows.filter(r=>r.avg!==null&&r.avg<4).sort((a,b)=>a.avg-b.avg)[0],goalRows=rows.filter(r=>r.g&&r.avg!==null),reached=goalRows.filter(r=>r.avg>=r.g.target).length;
+ const cards=[`<div class="stats-insight"><span class="stats-insight-icon">🏆</span><strong>Stärkstes Ergebnis</strong><p>${esc(subject(best.subjectId)?.name||'Fach')}: ${fmt(best.grade,1)} bei „${esc(best.title||'Bewertung')}“.</p></div>`,up?`<div class="stats-insight"><span class="stats-insight-icon">📈</span><strong>Grösste Verbesserung</strong><p>${esc(up.s.name)} entwickelt sich mit ${up.trend.delta>=0?'+':''}${fmt(up.trend.delta,2)} am stärksten.</p></div>`:`<div class="stats-insight"><span class="stats-insight-icon">↔</span><strong>Entwicklung</strong><p>Für einen belastbaren Trend sind pro Fach mehrere Noten nötig.</p></div>`,risk?`<div class="stats-insight"><span class="stats-insight-icon">⚠️</span><strong>Grösster Handlungsbedarf</strong><p>${esc(risk.s.name)} liegt momentan bei ${fmt(risk.avg,2)}. Dieses Fach zuerst angehen.</p></div>`:`<div class="stats-insight"><span class="stats-insight-icon">✅</span><strong>Keine rote Zone</strong><p>Kein ausgewertetes Fach liegt momentan unter der Note 4,0.</p></div>`,`<div class="stats-insight"><span class="stats-insight-icon">🎯</span><strong>Ziele erreicht</strong><p>${reached} von ${goalRows.length} auswertbaren Fachzielen sind aktuell erreicht.</p></div>`,`<div class="stats-insight"><span class="stats-insight-icon">🧭</span><strong>Schwächstes Einzelergebnis</strong><p>${esc(subject(worst.subjectId)?.name||'Fach')}: ${fmt(worst.grade,1)} bei „${esc(worst.title||'Bewertung')}“.</p></div>`];
+ return cards.join('');
+}
+
+function renderStatistics(root){
+ root.innerHTML=pageHead("Auswertung","Statistikzentrale","Analysiere Noten, Fächer, Ziele, Zeitverlauf, Verteilung und Prüfungsarten.",`<button class="btn btn-secondary" data-action="restart-tour">? Einführung</button>`)+
+ `<section class="card stats-toolbar"><div><h2 style="margin:0">Auswertung einstellen</h2><p class="muted" style="margin:3px 0 0">Filtere die Zahlen und sortiere die Fachrangliste.</p></div><div class="stats-filter-group"><div class="stats-filter"><label>Zeitraum</label><select class="select" id="statsPeriod"><option value="all">Ganzes Projekt</option><option value="30">Letzte 30 Tage</option><option value="90">Letzte 90 Tage</option><option value="180">Letzte 180 Tage</option></select></div><div class="stats-filter"><label>Fach</label><select class="select" id="statsSubject"><option value="all">Alle Fächer</option>${currentSubjects().map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div><div class="stats-filter"><label>Rangliste</label><select class="select" id="statsSort"><option value="average">Höchster Schnitt</option><option value="count">Meiste Noten</option><option value="best">Beste Einzelnote</option><option value="worst">Schwächste zuerst</option><option value="trend">Stärkster Trend</option></select></div></div></section><div id="statisticsContent"></div>`;
+ const draw=()=>{
+  const period=$("#statsPeriod")?.value||'all',subjectId=$("#statsSubject")?.value||'all',sortKey=$("#statsSort")?.value||'average';
+  let arr=projectAssessments().filter(a=>a.include!==false);arr=statsPeriodFilter(arr,period);if(subjectId!=='all')arr=arr.filter(a=>a.subjectId===subjectId);arr=sortedAssessments(arr);
+  const grades=arr.map(a=>+a.grade).filter(Number.isFinite),avg=weightedAverage(arr),best=grades.length?Math.max(...grades):null,worst=grades.length?Math.min(...grades):null,median=statsMedian(grades),mode=statsMode(grades),deviation=statsDeviation(grades),passing=+data.settings.passingGrade||4,passed=grades.filter(g=>g>=passing).length,failed=grades.length-passed,passRate=grades.length?passed/grades.length*100:0,rows=statsSubjectRows(arr,sortKey),trend=statsTrendForArray(arr);
+  const types=[...new Set(arr.map(a=>a.type||'Bewertung'))].map(type=>{const a=arr.filter(x=>(x.type||'Bewertung')===type);return{type,count:a.length,avg:weightedAverage(a)}}).sort((a,b)=>b.count-a.count);
+  const months=new Map();arr.forEach(a=>{const raw=a.examDate||a.date||a.createdAt||'',d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T12:00:00':raw);if(Number.isNaN(d.getTime()))return;const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label=d.toLocaleDateString('de-CH',{month:'short',year:'2-digit'});if(!months.has(key))months.set(key,{key,label,arr:[]});months.get(key).arr.push(a)});const monthRows=[...months.values()].sort((a,b)=>a.key.localeCompare(b.key)).slice(-8).map(m=>({...m,avg:weightedAverage(m.arr)})),maxMonth=Math.max(1,...monthRows.map(m=>m.arr.length));
+  const overallGoals=currentSubjects().map(s=>({s,g:goalFor(s.id),avg:averageFor(s.id)})).filter(x=>x.g&&x.avg!==null),reached=overallGoals.filter(x=>x.avg>=x.g.target).length;
+  $("#statisticsContent").innerHTML=
+  `<section class="stats-kpi-grid"><article class="stats-kpi"><div class="stats-kpi-icon">Ø</div><div class="stats-kpi-label">Schnitt</div><div class="stats-kpi-value">${avg===null?'–':fmt(avg,2)}</div><div class="stats-kpi-note">Gewichtet · ${arr.length} Noten</div></article><article class="stats-kpi"><div class="stats-kpi-icon">↑</div><div class="stats-kpi-label">Beste Note</div><div class="stats-kpi-value">${best===null?'–':fmt(best,1)}</div><div class="stats-kpi-note">Höchstes Ergebnis</div></article><article class="stats-kpi"><div class="stats-kpi-icon">↓</div><div class="stats-kpi-label">Schwächste Note</div><div class="stats-kpi-value">${worst===null?'–':fmt(worst,1)}</div><div class="stats-kpi-note">Tiefstes Ergebnis</div></article><article class="stats-kpi"><div class="stats-kpi-icon">M</div><div class="stats-kpi-label">Median</div><div class="stats-kpi-value">${median===null?'–':fmt(median,1)}</div><div class="stats-kpi-note">Mittlere Note</div></article><article class="stats-kpi"><div class="stats-kpi-icon">≋</div><div class="stats-kpi-label">Häufigste Note</div><div class="stats-kpi-value">${mode===null?'–':fmt(mode,1)}</div><div class="stats-kpi-note">${mode===null?'Keine Wiederholung':'Modalwert'}</div></article><article class="stats-kpi"><div class="stats-kpi-icon">σ</div><div class="stats-kpi-label">Schwankung</div><div class="stats-kpi-value">${grades.length<2?'–':fmt(deviation,2)}</div><div class="stats-kpi-note">${deviation<.35?'Sehr konstant':deviation<.7?'Mittel':'Stark wechselnd'}</div></article></section>`+
+  `<section class="stats-layout"><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Noten und Schnitt über die Zeit</h2><p>Farbige Punkte sind einzelne Noten; die Linie zeigt den laufenden Schnitt.</p></div>${trendBadge(trend,true)}</div><div class="stats-chart">${statsTimeChart(arr)}</div></article><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Bestanden und nicht bestanden</h2><p>Grenze: Note ${fmt(passing,1)}</p></div></div>${grades.length?`<div class="stats-ring-wrap"><div class="stats-ring" style="--ring-value:${passRate}%"><div class="stats-ring-label"><strong>${fmt(passRate,0)}%</strong><span>bestanden</span></div></div><div class="stats-legend"><div class="stats-legend-row"><span><i class="stats-legend-dot" style="background:#16a34a"></i>Bestanden</span><strong>${passed}</strong></div><div class="stats-legend-row"><span><i class="stats-legend-dot" style="background:#ef4444"></i>Nicht bestanden</span><strong>${failed}</strong></div><div class="stats-legend-row"><span>Fachziele erreicht</span><strong>${reached}/${overallGoals.length}</strong></div></div></div>`:`<div class="stats-empty">Noch keine Daten für diese Auswahl.</div>`}</article></section>`+
+  `<section class="stats-layout equal"><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Notenverteilung</h2><p>Wie häufig deine Noten in den einzelnen Bereichen liegen.</p></div></div>${statsDistribution(arr)}</article><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Prüfungsarten</h2><p>Anzahl und Schnitt nach Prüfung, Aufgabe, Vortrag und weiteren Arten.</p></div></div>${types.length?`<div class="stats-type-grid">${types.map(t=>`<div class="stats-type-row"><strong>${esc(t.type)}</strong><div class="stats-horizontal-track"><div class="stats-horizontal-fill" style="width:${Math.max(5,(t.avg-1)/5*100)}%"></div></div><span>${t.count}× · Ø ${fmt(t.avg,2)}</span></div>`).join('')}</div>`:`<div class="stats-empty">Keine Prüfungsarten vorhanden.</div>`}</article></section>`+
+  `<section class="card stats-chart-card" style="margin-bottom:17px"><div class="stats-card-head"><div><h2>Fachrangliste</h2><p>Sortierbare Übersicht mit Schnitt, Anzahl, Bestwert, Tiefstwert, Bestehensquote und Trend.</p></div></div>${rows.length?`<div class="stats-ranking"><div class="stats-rank-row header"><span>#</span><span>Fach</span><span>Schnitt</span><span>Noten</span><span>Beste</span><span>Tiefste</span><span>Bestanden</span><span>Trend</span></div>${rows.map((r,i)=>{const color=subjectColor(r.s,r.index),pct=r.avg===null?0:Math.max(0,Math.min(100,(r.avg-1)/5*100));return`<button class="stats-rank-row" data-action="dashboard-subject" data-id="${r.s.id}" style="--subject-color:${color};text-align:left"><span class="stats-rank-number">${i+1}</span><span class="stats-rank-subject"><span class="subject-dot"></span><strong>${esc(r.s.name)}</strong></span><span><strong>${fmt(r.avg,2)}</strong><div class="stats-mini-progress"><span style="width:${pct}%"></span></div></span><span class="stats-cell">${r.a.length}<small>Noten</small></span><span class="stats-cell">${fmt(r.best,1)}</span><span class="stats-cell">${fmt(r.worst,1)}</span><span class="stats-cell">${fmt(r.pass,0)}%</span><span class="stats-cell">${r.trend.direction==='up'?'↑':r.trend.direction==='down'?'↓':'→'} ${r.trend.delta===null?'–':fmt(Math.abs(r.trend.delta),2)}</span></button>`}).join('')}</div>`:`<div class="stats-empty">Für diese Auswahl gibt es noch keine Fachwerte.</div>`}</section>`+
+  `<section class="stats-layout equal"><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Zeitstatistik nach Monat</h2><p>Wie viele Noten du pro Monat erhalten hast und wie hoch der Monatsschnitt war.</p></div></div>${monthRows.length?`<div class="stats-month-grid">${monthRows.map(m=>`<div class="stats-month-row"><strong>${esc(m.label)}</strong><div class="stats-horizontal-track"><div class="stats-horizontal-fill" style="width:${m.arr.length/maxMonth*100}%"></div></div><span>${m.arr.length}× · Ø ${fmt(m.avg,2)}</span></div>`).join('')}</div>`:`<div class="stats-empty">Keine datierten Noten vorhanden.</div>`}</article><article class="card stats-chart-card"><div class="stats-card-head"><div><h2>Automatische Erkenntnisse</h2><p>Die wichtigsten Auffälligkeiten aus deinen Zahlen.</p></div></div><div class="stats-insights">${statsInsightCards(arr,rows)}</div></article></section>`;
+  bindActions();
+ };
+ ["statsPeriod","statsSubject","statsSort"].forEach(id=>$("#"+id).onchange=draw);draw();
+}
+function renderPlanner(root){
+ const subjects=currentSubjects();
+ root.innerHTML=pageHead("Planung","Notenplaner","Berechne realistischer, welche Durchschnittsnote du in den nächsten Bewertungen brauchst.")+planningNav("planner")+
+ (subjects.length?`<section class="grid grid-2"><article class="card"><h2>Berechnung</h2><form id="plannerForm" class="form"><div class="field full"><label>Fach</label><select class="select" name="subjectId">${subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")}</select></div><div class="field"><label>Zielnote</label><input class="input" name="target" type="number" min="1" max="6" step=".1" value="${fmt(data.settings.overallTarget||5,1)}"></div><div class="field"><label>Anzahl kommende Noten</label><input class="input" name="count" type="number" min="1" max="10" step="1" value="1"></div><div class="field full"><label>Gewichtung je neuer Note</label><input class="input" name="weight" type="number" min=".1" max="10" step=".1" value="1"></div><div class="field full"><button class="btn btn-primary">Berechnen</button></div></form></article><article class="card"><h2>Was wird berechnet?</h2><p class="muted">Der Planer nimmt deine bisherigen gewichteten Noten und berechnet, welchen Durchschnitt du über die gewählte Anzahl kommender Bewertungen ungefähr brauchst.</p><div class="notice" style="margin-top:16px"><h3>Wichtig</h3><p>Das Ergebnis ist eine Orientierung. Lehrpersonen können Zeugnisnoten zusätzlich pädagogisch runden oder unterschiedlich gewichten.</p></div><div id="plannerResult"></div></article></section>`:empty("◇","Noch keine Fächer","Füge zuerst mindestens ein Fach hinzu."));
+ if(!$("#plannerForm"))return;
+ const calculate=()=>{const fd=new FormData($("#plannerForm")),sid=fd.get("subjectId"),target=+fd.get("target"),count=Math.max(1,+fd.get("count")||1),newWeight=Math.max(.1,+fd.get("weight")||1),arr=subjectAssessments(sid),w=arr.reduce((t,a)=>t+(+a.weight||1),0),sum=arr.reduce((t,a)=>t+(+a.grade||0)*(+a.weight||1),0),needed=arr.length?(target*(w+count*newWeight)-sum)/(count*newWeight):target,current=averageFor(sid),label=needed>6?"Mit diesen Angaben nicht erreichbar":needed<1?"Bereits abgesichert":`Ø ${fmt(needed,2)}`;$("#plannerResult").innerHTML=`<div class="planner-result"><div class="muted">Benötigter Durchschnitt in ${count} kommender ${count===1?"Note":"Noten"}</div><strong>${label}</strong><p>${arr.length?`Aktuell liegst du in ${esc(subject(sid)?.name||"diesem Fach")} bei ${fmt(current,2)}. Für das Ziel ${fmt(target,1)} brauchst du mit der gewählten Gewichtung ungefähr ${needed>6?"mehr als die Maximalnote 6,0":needed<1?"keine bestimmte Mindestnote mehr":`einen Durchschnitt von ${fmt(needed,2)}`}.`:"Da noch keine Note vorhanden ist, entspricht der benötigte Durchschnitt zunächst genau deinem Ziel."}</p></div>`};
+ $("#plannerForm").onsubmit=e=>{e.preventDefault();calculate()};calculate();
+}
+
+function openMoreMenu(){
+ const groups=visibleGroups();modal("Bereiche",`<div class="grid grid-2">${groups.map(g=>`<button class="btn btn-secondary" data-more-pack="${g.id}" style="justify-content:flex-start;min-height:64px"><span style="font-size:24px">${g.icon}</span><span style="text-align:left"><strong>${esc(g.label)}</strong><small class="muted" style="display:block">${g.items.length} Seiten</small></span></button>`).join("")}</div>`);
+ $$('[data-more-pack]').forEach(b=>b.onclick=()=>{const id=b.dataset.morePack;closeModal();openPackMenu(id)});
+}
+function openDashboardSubjectModal(id){
+ const s=subject(id);if(!s)return;
+ const arr=sortedAssessments(subjectAssessments(id)),index=Math.max(0,currentSubjects().findIndex(x=>x.id===id)),color=subjectColor(s,index),avg=averageFor(id),g=goalFor(id),trend=trendForSubject(id),state=g?goalState(avg,g.target):"neutral";
+ const rows=[...arr].reverse().map(a=>`<div class="subject-grade-row"><div><strong>${esc(a.title||"Bewertung")}</strong><small>${dateFmt(a.examDate||a.date)} · ${esc(a.type||"Bewertung")} · Gewichtung ${fmt(a.weight||1,1)}×</small></div><span class="grade-pill ${gradeTone(a.grade)}">${fmt(a.grade,1)}</span></div>`).join("");
+ modal(`${s.name} – Noten`,`<section class="subject-detail-hero" style="--subject-color:${color}"><div class="subject-detail-head"><div class="subject-detail-title"><span class="subject-dot"></span><div><h3>${esc(s.name)}</h3><p>${esc(s.category||"Schulfach")} · ${esc(activeProject().name||"")}</p></div></div><div class="subject-detail-average"><span>Aktueller Schnitt</span><strong>${avg===null?"–":fmt(avg,2)}</strong></div></div><div class="subject-detail-kpis"><div class="subject-detail-kpi"><span>Ziel</span><strong>${g?fmt(g.target,1):"Nicht gesetzt"}</strong></div><div class="subject-detail-kpi"><span>Anzahl Noten</span><strong>${arr.length}</strong></div><div class="subject-detail-kpi"><span>Status</span><strong>${!g?"Ohne Ziel":avg===null?"Noch offen":state==="good"?"Ziel erreicht":"Unter Ziel"}</strong></div></div><div class="subject-detail-chart">${subjectLineChart(id,false)}</div><div class="subject-detail-actions"><button class="btn btn-primary btn-sm" id="detailAddGrade">＋ Note eintragen</button><button class="btn btn-secondary btn-sm" id="detailSetGoal">${g?"Ziel ändern":"Ziel setzen"}</button><button class="btn btn-secondary btn-sm" id="detailEditColor">🎨 Farbe ändern</button>${trendBadge(trend,true)}</div></section><h3>Alle Noten</h3>${arr.length?`<div class="subject-grade-list">${rows}</div>`:`<div class="notice"><h3>Noch keine Noten</h3><p>Trage die erste Note ein, damit der Verlauf berechnet werden kann.</p></div>`}`);
+ $("#detailAddGrade").onclick=()=>{closeModal();openGradeModal(null,id)};
+ $("#detailSetGoal").onclick=()=>{closeModal();openGoalModal(id)};
+ $("#detailEditColor").onclick=()=>{closeModal();openSubjectModal(s)};
+}
+
+function openSubjectModal(existing=null){
+ const subjectIndex=existing?Math.max(0,data.subjects.findIndex(s=>s.id===existing.id)):data.subjects.length;
+ const list=(isPrimary()?PRIMARY_SUBJECTS:SECONDARY_SUBJECTS).filter(n=>!data.subjects.some(s=>s.name===n)||existing?.name===n);
+ const initialName=existing?.name||list[0]||"";
+ const recommendedColor=suggestedSubjectColor(initialName,subjectIndex),defaultColor=existing?subjectColor(existing,subjectIndex):recommendedColor;
+ modal(existing?"Fach bearbeiten":"Fach hinzufügen",`<form id="subjectForm" class="form"><div class="field full"><label>Fachname</label><input id="subjectNameInput" class="input" name="name" list="subjectList" value="${esc(existing?.name||"")}" required autocomplete="off"><datalist id="subjectList">${list.map(n=>`<option>${esc(n)}</option>`).join("")}</datalist></div><div class="field full"><label>Kategorie</label><input class="input" name="category" value="${esc(existing?.category||"Schulfach")}"></div><div class="field full"><label>Fachfarbe festlegen</label><div id="subjectColorSuggestion" class="subject-color-suggestion" style="--suggested-color:${recommendedColor}"><div class="subject-color-suggestion-main"><span class="subject-color-suggestion-dot"></span><div><strong id="subjectSuggestionTitle">Vorschlag: ${esc(colorName(recommendedColor))}</strong><small id="subjectSuggestionText">Passende Standardfarbe für ${esc(initialName||"dieses Fach")}</small></div></div><button type="button" class="btn btn-secondary btn-sm" id="useSuggestedColor" data-suggested-color="${recommendedColor}">Vorschlag verwenden</button></div><div class="subject-color-palette-note"><strong>Weitere Farben</strong><span>Für jedes Fach separat wählbar</span></div><div class="subject-color-palette">${COLORS.map(c=>`<button type="button" class="subject-color-swatch ${c.toLowerCase()===defaultColor.toLowerCase()?"active":""}" data-subject-color="${c}" style="background:${c}" title="${esc(colorName(c))}" aria-label="${esc(colorName(c))}"></button>`).join("")}</div><label class="subject-color-custom"><input id="subjectColorInput" name="color" type="color" value="${defaultColor}"><span><strong>Eigene Farbe wählen</strong><small class="muted" style="display:block">Du kannst zusätzlich jede beliebige Farbe einstellen.</small></span></label><input id="subjectColorSource" name="colorSource" type="hidden" value="${esc(existing?.colorSource||"suggested")}"><div id="subjectColorPreview" class="subject-color-preview" style="--preview-color:${defaultColor}"><span class="subject-color-preview-dot"></span><div><strong id="subjectPreviewTitle">So wird ${esc(existing?.name||"dein Fach")} markiert</strong><small>Die Farbe erscheint bei Fächern, Noten, Zielen und Übersichten.</small></div></div></div></form>`,`<button class="btn btn-secondary" data-close-modal>Abbrechen</button><button class="btn btn-primary" id="saveSubject">Speichern</button>`);
+ const input=$("#subjectColorInput"),source=$("#subjectColorSource"),preview=$("#subjectColorPreview"),nameInput=$("#subjectNameInput"),suggestion=$("#subjectColorSuggestion"),suggestionButton=$("#useSuggestedColor"),suggestionTitle=$("#subjectSuggestionTitle"),suggestionText=$("#subjectSuggestionText"),previewTitle=$("#subjectPreviewTitle"),swatches=$$("[data-subject-color]");
+ let previousSuggested=recommendedColor,colorTouched=!!existing&&existing.colorSource!=="suggested";
+ const applyColor=(color,origin="custom")=>{input.value=color;source.value=origin;preview.style.setProperty("--preview-color",color);swatches.forEach(b=>b.classList.toggle("active",b.dataset.subjectColor.toLowerCase()===color.toLowerCase()));if(origin!=="suggested")colorTouched=true};
+ const updateSuggestion=()=>{const name=nameInput.value.trim(),next=suggestedSubjectColor(name,subjectIndex),wasFollowingSuggestion=!colorTouched||input.value.toLowerCase()===previousSuggested.toLowerCase();previousSuggested=next;suggestion.style.setProperty("--suggested-color",next);suggestionButton.dataset.suggestedColor=next;suggestionTitle.textContent=`Vorschlag: ${colorName(next)}`;suggestionText.textContent=`Passende Standardfarbe für ${name||"dieses Fach"}`;previewTitle.textContent=`So wird ${name||"dein Fach"} markiert`;if(!existing&&wasFollowingSuggestion)applyColor(next,"suggested")};
+ swatches.forEach(b=>b.onclick=()=>applyColor(b.dataset.subjectColor,"custom"));
+ input.oninput=e=>applyColor(e.target.value,"custom");
+ suggestionButton.onclick=()=>{colorTouched=false;applyColor(suggestionButton.dataset.suggestedColor,"suggested")};
+ nameInput.addEventListener("input",updateSuggestion);nameInput.addEventListener("change",updateSuggestion);
+ $$('[data-close-modal]').forEach(x=>x.onclick=closeModal);$("#saveSubject").onclick=()=>{const form=$("#subjectForm");if(!form.reportValidity())return;const fd=new FormData(form),obj={id:existing?.id||uid(),name:String(fd.get("name")).trim(),category:String(fd.get("category")).trim()||"Schulfach",color:String(fd.get("color")||suggestedSubjectColor(fd.get("name"),subjectIndex)),colorSource:String(fd.get("colorSource")||"custom"),archived:false};if(existing)Object.assign(existing,obj);else data.subjects.push(obj);save();closeModal();toast("Fach und individuelle Farbe gespeichert.");render()};
+}
+function openGradeModal(existing=null,preSubject=null){
+ if(!currentSubjects().length)return toast("Füge zuerst ein Fach hinzu.",true);
+ modal(existing?"Note ändern":"Neue Note eintragen",`<form id="gradeForm" class="form"><div class="field full"><label>Fach</label><select class="select" name="subjectId" required>${currentSubjects().map((s,i)=>`<option value="${s.id}" ${(existing?.subjectId||preSubject)===s.id?"selected":""}>● ${esc(s.name)}</option>`).join("")}</select></div><div class="field full"><label>Aufgabe oder Prüfung</label><input class="input" name="title" value="${esc(existing?.title||"")}" placeholder="${isPrimary()?"z. B. Mathetest":"z. B. Prüfung Bruchrechnen"}" required></div><div class="field"><label>Note</label><input class="input" name="grade" type="number" min="1" max="6" step=".1" value="${existing?.grade??5}" required></div><div class="field"><label>Gewichtung</label><input class="input" name="weight" type="number" min=".1" max="10" step=".1" value="${existing?.weight??1}" required></div><div class="field"><label>Datum</label><input class="input" name="examDate" type="date" value="${existing?.examDate||existing?.date||today()}" required></div><div class="field"><label>Art</label><select class="select" name="type"><option>Prüfung</option><option>Aufgabe</option><option>Vortrag</option><option>Projekt</option><option>Mitarbeit</option></select></div></form>`,`<button class="btn btn-secondary" data-close-modal>Abbrechen</button><button class="btn btn-primary" id="saveGrade">Speichern</button>`);
+ $$('[data-close-modal]').forEach(x=>x.onclick=closeModal);$("#saveGrade").onclick=()=>{const form=$("#gradeForm");if(!form.reportValidity())return;const fd=new FormData(form),obj={id:existing?.id||uid(),subjectId:fd.get("subjectId"),semesterId:activeProject().id,title:String(fd.get("title")).trim(),grade:+fd.get("grade"),weight:+fd.get("weight"),examDate:fd.get("examDate"),type:fd.get("type"),include:true,createdAt:existing?.createdAt||new Date().toISOString()};if(existing)Object.assign(existing,obj);else data.assessments.push(obj);save();closeModal();toast("Note gespeichert. Trend und Zielstatus wurden aktualisiert.");render()};
+}
+function openGoalModal(subjectId=null){
+ if(!currentSubjects().length)return toast("Füge zuerst ein Fach hinzu.",true);
+ const old=subjectId?goalFor(subjectId):null;
+ modal("Zielnote festlegen",`<form id="goalForm" class="form"><div class="field full"><label>Fach</label><select class="select" name="subjectId">${currentSubjects().map(s=>`<option value="${s.id}" ${(subjectId||old?.subjectId)===s.id?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div><div class="field full"><label>Zielnote</label><input class="input" name="target" type="number" min="1" max="6" step=".1" value="${old?.target??5}" required></div></form>`,`<button class="btn btn-secondary" data-close-modal>Abbrechen</button><button class="btn btn-primary" id="saveGoal">Speichern</button>`);
+ $$("[data-close-modal]").forEach(x=>x.onclick=closeModal);$("#saveGoal").onclick=()=>{const form=$("#goalForm");if(!form.reportValidity())return;const fd=new FormData(form),sid=fd.get("subjectId"),existing=goalFor(sid),obj={id:existing?.id||uid(),subjectId:sid,semesterId:activeProject().id,target:+fd.get("target"),active:true};if(existing)Object.assign(existing,obj);else data.goals.push(obj);save();closeModal();toast("Ziel gespeichert.");render()};
+}
+function openProjectModal(existing=null){
+ if(!existing&&!premiumActive()&&data.semesters.length>=FREE_PROJECT_LIMIT)return toast("Im kostenlosen Plan sind höchstens drei Projekte möglich.",true);
+ modal(existing?"Projekt bearbeiten":"Projekt erstellen",`<form id="projectForm" class="form"><div class="field full"><label>Name</label><input class="input" name="name" value="${esc(existing?.name||"")}" placeholder="z. B. 5. Klasse – 1. Semester" required></div><div class="field"><label>Art</label><select class="select" name="kind"><option>Semester</option><option>Schuljahr</option><option>Projekt</option></select></div><div class="field"><label>Schuljahr</label><input class="input" name="schoolYear" value="${esc(existing?.schoolYear||"")}"></div><div class="field full"><label>Beschreibung</label><textarea class="textarea" name="description">${esc(existing?.description||"")}</textarea></div><div class="field"><label>Farbe</label><input name="color" type="color" value="${esc(existing?.color||COLORS[data.semesters.length%COLORS.length])}" style="width:100%;height:50px;border:1px solid var(--line);border-radius:12px;background:var(--card)"></div></form>`,`<button class="btn btn-secondary" data-close-modal>Abbrechen</button><button class="btn btn-primary" id="saveProject">Speichern</button>`);
+ $$("[data-close-modal]").forEach(x=>x.onclick=closeModal);$("#saveProject").onclick=()=>{const form=$("#projectForm");if(!form.reportValidity())return;const fd=new FormData(form),obj={id:existing?.id||uid(),name:String(fd.get("name")).trim(),kind:fd.get("kind"),schoolYear:String(fd.get("schoolYear")).trim(),description:String(fd.get("description")).trim(),color:fd.get("color")};if(existing)Object.assign(existing,obj);else{data.semesters.push(obj);data.activeSemesterId=obj.id}save();closeModal();toast("Projekt gespeichert.");render()};
+}
+function bindActions(){
+ $$("[data-go]").forEach(b=>b.onclick=()=>{view=b.dataset.go;render()});
+ $$("[data-pack-menu]").forEach(b=>b.onclick=()=>openPackMenu(b.dataset.packMenu));
+ $$("[data-action]").forEach(b=>b.onclick=()=>{
+  const a=b.dataset.action,id=b.dataset.id;
+  if(a==="more-menu")openMoreMenu();else if(a==="dashboard-subject")openDashboardSubjectModal(id);else if(a==="new-grade")openGradeModal();else if(a==="grade-for")openGradeModal(null,id);else if(a==="edit-grade")openGradeModal(data.assessments.find(x=>x.id===id));
+  else if(a==="delete-grade"){if(confirm("Diese Note wirklich löschen?")){data.assessments=data.assessments.filter(x=>x.id!==id);save();render()}}
+  else if(a==="new-subject")openSubjectModal();else if(a==="edit-subject")openSubjectModal(subject(id));
+  else if(a==="new-goal")openGoalModal();else if(a==="goal-for")openGoalModal(id);else if(a==="delete-goal"){data.goals=data.goals.filter(x=>x.id!==id);save();render()}
+  else if(a==="new-project")openProjectModal();else if(a==="edit-project")openProjectModal(data.semesters.find(x=>x.id===id));else if(a==="activate-project")setActiveProject(id);
+  else if(a==="delete-project"){if(confirm("Projekt und zugehörige Noten wirklich löschen?")){data.semesters=data.semesters.filter(x=>x.id!==id);data.assessments=data.assessments.filter(x=>x.semesterId!==id);data.goals=data.goals.filter(x=>x.semesterId!==id);data.activeSemesterId=data.semesters[0].id;save();render()}}
+  else if(a==="report-grade"){const old=data.reportGrades.find(r=>r.subjectId===id&&(!r.semesterId||r.semesterId===activeProject().id)),v=prompt("Zeugnisnote eingeben (1 bis 6):",old?.grade??"");if(v===null)return;const n=+v;if(n<1||n>6)return toast("Bitte eine Note zwischen 1 und 6 eingeben.",true);if(old)old.grade=n;else data.reportGrades.push({id:uid(),subjectId:id,semesterId:activeProject().id,grade:n});save();render()}
+  else if(a==="export"){const payload={app:"NotenPilot Schweiz",version:2,exportedAt:new Date().toISOString(),store};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`notenpilot-sicherung-${today()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+  else if(a==="restart-tour"){startTour()}
+  else if(a==="logout"){sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);user=null;data=null;showAuth("login")}
+ });
+ if($("#importFile"))$("#importFile").onchange=e=>{const file=e.target.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const obj=JSON.parse(r.result),incoming=obj.store||obj;if(!incoming.accounts||!incoming.data)throw Error();if(!confirm("Die aktuellen lokalen Daten werden ersetzt. Fortfahren?"))return;store=incoming;save();location.reload()}catch{toast("Diese Datei ist keine gültige NotenPilot-Sicherung.",true)}};r.readAsText(file)};
+}
+$$('.tab').forEach(b=>b.onclick=()=>showAuth(b.dataset.auth));
+$("#loginForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),login=String(fd.get("login")).trim().toLowerCase(),hash=await sha(String(fd.get("password")));const acc=store.accounts.find(a=>(a.email||"").toLowerCase()===login||(a.username||"").toLowerCase()===login);if(!acc)return $("#authMsg").innerHTML='<div class="message bad">Konto nicht gefunden.</div>';if(acc.passwordHash&&acc.passwordHash!==hash)return $("#authMsg").innerHTML='<div class="message bad">Das Passwort ist falsch.</div>';loginUser(acc)};
+$("#registerForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),email=String(fd.get("email")).trim().toLowerCase(),username=String(fd.get("username")).trim(),password=String(fd.get("password"));if(store.accounts.some(a=>(a.email||"").toLowerCase()===email||(a.username||"").toLowerCase()===username.toLowerCase()))return $("#authMsg").innerHTML='<div class="message bad">E-Mail-Adresse oder Username wird bereits verwendet.</div>';const id=uid(),acc={id,email,username,passwordHash:await sha(password),profile:{displayName:username,schoolName:"",schoolLevel:"Sekundarstufe",classLevel:"1. Klasse",avatarColor:COLORS[0]},createdAt:new Date().toISOString()};store.accounts.push(acc);store.data[id]=defaultData();save();loginUser(acc)};
+$("#quickAdd").onclick=()=>openGradeModal();
+$("#themeBtn").onclick=()=>{data.settings.theme=data.settings.theme==="dark"?"light":"dark";save();render()};
+const session=sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY),acc=store.accounts.find(a=>a.id===session);
+if(acc)loginUser(acc);else showAuth("login");
+})();
+</script>
+
+
+<script>
+(() => {
+  const setAppHeight = () => {
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    if (viewportHeight) document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
+  };
+  setAppHeight();
+  window.addEventListener("resize", setAppHeight, {passive:true});
+  window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 120), {passive:true});
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", setAppHeight, {passive:true});
+    window.visualViewport.addEventListener("scroll", setAppHeight, {passive:true});
+  }
+  document.addEventListener("focusin", event => {
+    if (!event.target.matches("input,select,textarea")) return;
+    setTimeout(() => event.target.scrollIntoView({block:"center",behavior:"smooth"}), 180);
+  });
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
